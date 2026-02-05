@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRWF — Full-Pool Tabulation Demo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+  :root {
+    --wrwf-teal: #2a7f7f;
+    --wrwf-teal-light: #e6f3f3;
+    --wrwf-teal-dark: #1d5c5c;
+    --wrwf-gold: #c8a951;
+    --wrwf-gold-light: #f5efd8;
+    --wrwf-cream: #faf8f3;
+    --wrwf-charcoal: #2d2d2d;
+    --wrwf-warm-gray: #6b6560;
+    --wrwf-border: #d4cfc7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--wrwf-cream); color: var(--wrwf-charcoal); line-height: 1.6; }
+
+  .container { max-width: 1000px; margin: 0 auto; padding: 40px 24px; }
+
+  .back-link { display: inline-block; color: var(--wrwf-teal); text-decoration: none; font-size: 14px; margin-bottom: 16px; }
+  .back-link:hover { text-decoration: underline; }
+
+  header {
+    text-align: center;
+    padding: 40px 20px 30px;
+    border-bottom: 3px solid var(--wrwf-teal);
+    margin-bottom: 40px;
+  }
+
+  .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: var(--wrwf-teal); }
+  .logo-sub { font-size: 12px; font-weight: 500; color: var(--wrwf-warm-gray); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--wrwf-teal-dark);
+    margin-top: 20px;
+  }
+
+  h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--wrwf-teal-dark);
+    margin: 36px 0 16px;
+    border-bottom: 1px solid var(--wrwf-border);
+    padding-bottom: 8px;
+  }
+
+  p { margin-bottom: 16px; font-size: 15px; }
+
+  .demo-banner {
+    background: #2a6b8a;
+    color: white;
+    text-align: center;
+    padding: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .explanation-box {
+    background: white;
+    border: 1px solid var(--wrwf-border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 30px;
+  }
+
+  .explanation-box h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--wrwf-teal-dark);
+    margin-bottom: 10px;
+  }
+
+  .explanation-box p { font-size: 14px; color: var(--wrwf-warm-gray); margin-bottom: 8px; }
+  .explanation-box p:last-child { margin-bottom: 0; }
+
+  .highlight-box {
+    background: var(--wrwf-gold-light);
+    border-left: 3px solid var(--wrwf-gold);
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-size: 14px;
+    border-radius: 0 6px 6px 0;
+  }
+
+  /* Tabulation table */
+  .tab-table-wrap {
+    overflow-x: auto;
+    margin: 24px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .tab-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: white;
+    min-width: 700px;
+  }
+
+  .tab-table th {
+    background: var(--wrwf-teal);
+    color: white;
+    padding: 12px 10px;
+    text-align: right;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .tab-table th:first-child { text-align: left; }
+  .tab-table th.avg-col { background: var(--wrwf-teal-dark); }
+
+  .tab-table td {
+    padding: 10px;
+    border-bottom: 1px solid var(--wrwf-border);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tab-table td:first-child {
+    text-align: left;
+    font-weight: 500;
+  }
+
+  .tab-table td.avg-col {
+    background: var(--wrwf-teal-light);
+    font-weight: 700;
+    color: var(--wrwf-teal-dark);
+  }
+
+  .tab-table td.req-col {
+    color: var(--wrwf-warm-gray);
+    font-style: italic;
+  }
+
+  .tab-table tr:nth-child(even) { background: #faf8f3; }
+  .tab-table tr:nth-child(even) td.avg-col { background: #d9edec; }
+
+  .tab-table tfoot td {
+    border-top: 2px solid var(--wrwf-teal);
+    font-weight: 700;
+    background: #f0f0ec;
+  }
+
+  .tab-table tfoot td.avg-col {
+    background: var(--wrwf-teal);
+    color: white;
+  }
+
+  /* Bar chart */
+  .chart-section { margin: 30px 0; }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .bar-label {
+    width: 180px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .bar-container {
+    flex: 1;
+    position: relative;
+    height: 28px;
+  }
+
+  .bar-avg {
+    height: 28px;
+    border-radius: 4px;
+    background: var(--wrwf-teal);
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: width 0.5s ease;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .bar-requested {
+    position: absolute;
+    top: 0;
+    height: 28px;
+    border-right: 3px dashed var(--wrwf-gold);
+  }
+
+  .bar-req-label {
+    position: absolute;
+    top: -16px;
+    font-size: 10px;
+    color: var(--wrwf-gold);
+    font-weight: 600;
+    transform: translateX(-50%);
+    white-space: nowrap;
+  }
+
+  .bar-amount {
+    width: 80px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--wrwf-teal-dark);
+    flex-shrink: 0;
+  }
+
+  .insights {
+    background: white;
+    border: 1px solid var(--wrwf-border);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 30px 0;
+  }
+
+  .insights h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--wrwf-teal-dark);
+    margin-bottom: 12px;
+  }
+
+  .insights ul { margin: 0 0 0 20px; }
+  .insights li { margin-bottom: 8px; font-size: 14px; color: #555; }
+
+  footer {
+    text-align: center;
+    padding: 30px;
+    margin-top: 40px;
+    border-top: 1px solid var(--wrwf-border);
+    font-size: 13px;
+    color: var(--wrwf-warm-gray);
+  }
+</style>
+</head>
+<body>
+
+<div class="demo-banner">⬥ TABULATION DEMO — FULL-POOL DOLLAR ALLOCATION ⬥</div>
+
+<header>
+  <div class="logo-text">Wood River Women's Foundation</div>
+  <div class="logo-sub">Ketchum, Idaho</div>
+  <h1>How Full-Pool Tabulation Works</h1>
+</header>
+
+<div class="container">
+
+  <a class='back-link' href='/'>← Back to Overview</a>
+
+  <div class="explanation-box">
+    <h3>The Method</h3>
+    <p>Each of the 245 members independently allocates the entire $350,000 pool across the 27 applicants. When all ballots are collected, each applicant's allocations are <strong>averaged across all voters</strong> to produce the final grant amount.</p>
+    <p>Below is a simplified example with <strong>6 voters</strong> and <strong>6 organizations</strong> to illustrate the math. In practice, 245 voters and 27 organizations produce a more robust consensus.</p>
+    <div class="highlight-box">
+      <strong>The key principle:</strong> If most voters allocate similar amounts to an organization, the average reflects consensus. If opinions diverge widely, the average reflects a compromise. Either way, every member's voice is weighted equally.
+    </div>
+  </div>
+
+  <h2>Sample Ballots: 6 Voters Allocating $350,000</h2>
+
+  <div class="tab-table-wrap">
+    <table class="tab-table" id="tabTable">
+      <thead>
+        <tr>
+          <th>Organization</th>
+          <th>Requested</th>
+          <th>Voter 1</th>
+          <th>Voter 2</th>
+          <th>Voter 3</th>
+          <th>Voter 4</th>
+          <th>Voter 5</th>
+          <th>Voter 6</th>
+          <th class="avg-col">Average<br>(= Grant)</th>
+        </tr>
+      </thead>
+      <tbody id="tabBody">
+      </tbody>
+      <tfoot id="tabFoot">
+      </tfoot>
+    </table>
+  </div>
+
+  <h2>Resulting Grant Amounts vs. Requested</h2>
+
+  <p style="font-size: 14px; color: var(--wrwf-warm-gray); margin-bottom: 20px;">The teal bar shows the averaged grant amount. The gold dashed line marks what the organization requested.</p>
+
+  <div class="chart-section" id="chartSection">
+  </div>
+
+  <div class="insights">
+    <h3>What This Demonstrates</h3>
+    <ul>
+      <li><strong>Consensus emerges naturally.</strong> The Hunger Coalition received between $40K and $80K from different voters, but the average ($58,333) represents the group's collective judgment about appropriate funding.</li>
+      <li><strong>Small organizations aren't drowned out.</strong> Project 208 FC requested $5,000 and received an average of $11,667 — voters collectively decided this program deserves more than it asked for.</li>
+      <li><strong>The pool balances automatically.</strong> Because each voter allocates exactly $350,000, the average also totals $350,000. No post-vote adjustment is needed.</li>
+      <li><strong>Overallocation signals strong support.</strong> When a voter gives an organization more than it requested, that's a clear signal the membership values this work — useful data even if the final award is capped at the request.</li>
+      <li><strong>Every dollar is a tradeoff.</strong> A voter giving $80,000 to the Hunger Coalition necessarily has less to allocate elsewhere. The constraint makes every allocation a meaningful choice.</li>
+    </ul>
+  </div>
+
+  <div class="explanation-box">
+    <h3>Handling Edge Cases</h3>
+    <p><strong>What if the average exceeds the request?</strong> The board may cap awards at the requested amount and redistribute the surplus proportionally to other applicants, or allow organizations to use the additional funds for expanded scope. This is a policy decision, not a mathematical problem.</p>
+    <p><strong>What about rounding?</strong> Averages are rounded to the nearest $100 for clean grant amounts. Small rounding differences are absorbed by the pool.</p>
+    <p><strong>What if someone doesn't allocate the full $350,000?</strong> The ballot system requires the total to equal $350,000 before submission, just like the 100-point version requires all points to be allocated.</p>
+  </div>
+
+</div>
+
+<footer>
+  WRWF Voting System — Full-Pool Tabulation Demo<br>
+  Approach E: Dollar Allocation with Averaged Results
+</footer>
+
+<script>
+const orgs = [
+  { name: 'The Hunger Coalition', requested: 25000, votes: [80000, 60000, 50000, 40000, 55000, 65000] },
+  { name: 'Smiley Creek Fire', requested: 8400, votes: [10000, 15000, 5000, 8000, 12000, 10000] },
+  { name: 'Project 208 FC', requested: 5000, votes: [15000, 10000, 5000, 20000, 10000, 10000] },
+  { name: 'NAMI Wood River', requested: 25000, votes: [60000, 50000, 70000, 55000, 65000, 50000] },
+  { name: 'Senior Connection', requested: 15000, votes: [40000, 30000, 35000, 25000, 30000, 40000] },
+  { name: 'All Other Applicants (21)', requested: 271600, votes: [145000, 185000, 185000, 202000, 178000, 175000] }
+];
+
+function fmt(n) { return '$' + n.toLocaleString(); }
+
+// Build table
+const tbody = document.getElementById('tabBody');
+const maxAvg = Math.max(...orgs.map(o => o.votes.reduce((a,b) => a+b, 0) / o.votes.length));
+
+orgs.forEach(org => {
+  const avg = Math.round(org.votes.reduce((a,b) => a+b, 0) / org.votes.length / 100) * 100;
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>${org.name}</td>
+    <td class="req-col">${fmt(org.requested)}</td>
+    ${org.votes.map(v => `<td>${fmt(v)}</td>`).join('')}
+    <td class="avg-col">${fmt(avg)}</td>
+  `;
+  tbody.appendChild(tr);
+});
+
+// Totals row
+const tfoot = document.getElementById('tabFoot');
+const totalRequested = orgs.reduce((s,o) => s + o.requested, 0);
+const voterTotals = [0,0,0,0,0,0];
+orgs.forEach(org => org.votes.forEach((v,i) => voterTotals[i] += v));
+const totalAvg = Math.round(voterTotals.reduce((a,b) => a+b, 0) / 6 / 100) * 100;
+
+const tfootRow = document.createElement('tr');
+tfootRow.innerHTML = `
+  <td>TOTAL</td>
+  <td>${fmt(totalRequested)}</td>
+  ${voterTotals.map(t => `<td>${fmt(t)}</td>`).join('')}
+  <td class="avg-col">${fmt(totalAvg)}</td>
+`;
+tfoot.appendChild(tfootRow);
+
+// Build chart
+const chartSection = document.getElementById('chartSection');
+const chartMax = 80000; // scale for visible orgs (exclude "all other")
+
+orgs.slice(0, 5).forEach(org => {
+  const avg = Math.round(org.votes.reduce((a,b) => a+b, 0) / org.votes.length / 100) * 100;
+  const barPct = Math.min((avg / chartMax) * 100, 100);
+  const reqPct = Math.min((org.requested / chartMax) * 100, 100);
+
+  const row = document.createElement('div');
+  row.className = 'bar-row';
+  row.innerHTML = `
+    <div class="bar-label">${org.name}</div>
+    <div class="bar-container">
+      <div class="bar-avg" style="width: ${barPct}%">${fmt(avg)}</div>
+      <div class="bar-requested" style="left: ${reqPct}%">
+        <span class="bar-req-label">Requested: ${fmt(org.requested)}</span>
+      </div>
+    </div>
+  `;
+  chartSection.appendChild(row);
+});
+</script>
+</body>
+</html>

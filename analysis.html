@@ -120,6 +120,7 @@
     <ol>
       <li><strong>Current Ranked System</strong> — Rank 1-15 from all applicants</li>
       <li><strong>Participatory Budgeting</strong> — Allocate 100 points across applicants</li>
+      <li><strong>Full-Pool Dollar Allocation</strong> — Each member allocates the entire grant pool in real dollars</li>
       <li><strong>Quadratic Voting</strong> — Voice credits with escalating costs for strong preferences</li>
       <li><strong>Tiered Allocation</strong> — Rank within grant-size categories</li>
     </ol>
@@ -174,6 +175,22 @@
 
     <p><strong>Used by:</strong> Hundreds of cities worldwide for municipal budget allocation, including New York City, Paris, Madrid, and Porto Alegre (which pioneered the approach in 1989). The Participatory Budgeting Project has documented over 3,000 implementations.</p>
 
+    <h3>Full-Pool Dollar Allocation (Jan's Proposal)</h3>
+    <p>A variant of participatory budgeting in which each member allocates the <strong>entire grant pool</strong> (e.g., $350,000) in real dollar amounts across all applicants. When all ballots are collected, each applicant's allocations are averaged across all voters to produce the final grant amount.</p>
+
+    <div class="solution-box">
+      <h4>Key Advantages</h4>
+      <p>Voters think in concrete dollars rather than abstract points. There is no translation step between "what I allocated" and "what the organization receives." If you write $25,000 next to the Hunger Coalition, that's a direct statement about what you believe they should receive. The average of all members' allocations produces each organization's grant amount — the collective wisdom of the membership expressed in actual funding levels.</p>
+    </div>
+
+    <p><strong>How it differs from 100-point participatory budgeting:</strong> The 100-point version requires a conversion step — the board must translate aggregate points into dollar amounts. Full-pool allocation eliminates this: the averaged results <em>are</em> the grant amounts. Additionally, voters experience the real resource constraint ($350,000 for 27 applicants) rather than an abstract one (100 points).</p>
+
+    <p><strong>Potential concerns:</strong> Working with larger numbers may feel more intimidating than distributing 100 points. Some members may find it harder to decide between allocating $12,000 vs. $15,000 than between 3 points vs. 4 points. However, this specificity is also an advantage — it forces more deliberate thinking about appropriate funding levels.</p>
+
+    <p><strong>Tabulation:</strong> Straightforward averaging. Each applicant's grant amount equals the sum of all allocations to that applicant divided by the number of voters. Because every voter allocates exactly $350,000, the average also totals $350,000 — no post-vote adjustment is needed. <a href="tabulation-fullpool.html" style="color: var(--wrwf-teal);">See the tabulation demo →</a></p>
+
+    <p><strong>Used by:</strong> Investment clubs and cooperative housing boards commonly use full-pool dollar allocation for budget decisions. The approach mirrors how family foundations with small boards allocate grants — each trustee proposes a full allocation, and the board averages or negotiates from there.</p>
+
     <h3>Quadratic Voting</h3>
     <p>Members receive voice credits (e.g., 100) but the cost of expressing preference increases quadratically. One vote costs 1 credit, but 2 votes cost 4 credits total, 3 votes cost 9, and so on. This allows strong preferences while preventing any single member from dominating outcomes on multiple issues.</p>
 
@@ -199,6 +216,7 @@
         <th>Criterion</th>
         <th>Current Ranked</th>
         <th>Participatory</th>
+        <th>Full-Pool $</th>
         <th>Quadratic</th>
         <th>Tiered</th>
       </tr>
@@ -206,6 +224,7 @@
         <td><strong>Simplicity for voters</strong></td>
         <td>High</td>
         <td>High</td>
+        <td>Medium-High</td>
         <td>Medium</td>
         <td>High</td>
       </tr>
@@ -214,18 +233,29 @@
         <td>No</td>
         <td>Yes</td>
         <td>Yes</td>
+        <td>Yes</td>
         <td>Partial</td>
       </tr>
       <tr>
         <td><strong>Makes tradeoffs visible</strong></td>
         <td>No</td>
         <td>Yes</td>
+        <td>Yes — in real dollars</td>
         <td>Yes</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td><strong>Results directly in grant amounts</strong></td>
+        <td>No</td>
+        <td>No — requires translation</td>
+        <td>Yes</td>
+        <td>No</td>
         <td>No</td>
       </tr>
       <tr>
         <td><strong>Protects small organizations</strong></td>
         <td>No</td>
+        <td>Partial</td>
         <td>Partial</td>
         <td>Partial</td>
         <td>Yes</td>
@@ -236,10 +266,12 @@
         <td>Yes</td>
         <td>Yes</td>
         <td>Yes</td>
+        <td>Yes</td>
       </tr>
       <tr>
         <td><strong>Resistant to strategic voting</strong></td>
         <td>Low</td>
+        <td>Medium</td>
         <td>Medium</td>
         <td>High</td>
         <td>Medium</td>
@@ -248,6 +280,7 @@
         <td><strong>Familiar to members</strong></td>
         <td>Yes</td>
         <td>Moderate</td>
+        <td>Moderate</td>
         <td>No</td>
         <td>Moderate</td>
       </tr>
@@ -255,6 +288,7 @@
         <td><strong>Tabulation complexity</strong></td>
         <td>Simple</td>
         <td>Simple</td>
+        <td>Simple — just averaging</td>
         <td>Moderate</td>
         <td>Simple</td>
       </tr>
@@ -267,6 +301,7 @@
     <ul>
       <li><strong>Ranked:</strong> Food bank likely wins (more people rank it highly)</li>
       <li><strong>Participatory:</strong> Youth program receives concentrated points from passionate supporters; may compete effectively</li>
+      <li><strong>Full-Pool $:</strong> Same dynamic as participatory, but the passionate 20% can allocate real dollar amounts — e.g., $20,000 each — making the support level concrete and averaged in</li>
       <li><strong>Quadratic:</strong> Passionate supporters can spend heavily on youth program; outcome depends on credit distribution</li>
       <li><strong>Tiered:</strong> They don't compete directly (different tiers)</li>
     </ul>
@@ -276,6 +311,7 @@
     <ul>
       <li><strong>Ranked:</strong> Vote-splitting hurts both; neither may rank highly</li>
       <li><strong>Participatory:</strong> Members can support both with partial allocations</li>
+      <li><strong>Full-Pool $:</strong> Members can split real dollar amounts — e.g., $15,000 to each food bank — making the split-support explicit and quantified</li>
       <li><strong>Quadratic:</strong> Same as participatory</li>
       <li><strong>Tiered:</strong> If same tier, they compete directly within that pool</li>
     </ul>
@@ -383,6 +419,26 @@
       <div class="org-type">Academic</div>
       <h4>Collective Decision-Making Research</h4>
       <p>Key academic works include "Radical Markets" (Posner & Weyl, 2018) on quadratic voting, and the extensive literature on social choice theory stemming from Arrow's impossibility theorem.</p>
+    </div>
+
+    <h3>Full-Pool Dollar Allocation Precedents</h3>
+
+    <div class="reference-card">
+      <div class="org-type">Cooperative Governance</div>
+      <h4>Investment Clubs & Housing Cooperatives</h4>
+      <p>Many investment clubs use full-pool allocation for portfolio decisions — each member proposes a complete allocation of the club's funds, and results are averaged or negotiated. Housing cooperatives use similar approaches for capital improvement budgets.</p>
+    </div>
+
+    <div class="reference-card">
+      <div class="org-type">Family Philanthropy</div>
+      <h4>Family Foundation Boards</h4>
+      <p>Small family foundations often have each trustee independently propose a full grant slate (allocating the entire annual budget), then average or discuss differences to reach consensus. The full-pool approach scales this practice to a larger membership.</p>
+    </div>
+
+    <div class="reference-card">
+      <div class="org-type">Academic Research</div>
+      <h4>Averaging-Based Allocation</h4>
+      <p>Research on "wisdom of crowds" (Surowiecki, 2004) demonstrates that averaged independent estimates often outperform individual expert judgment. Full-pool allocation applies this principle directly — each member's independent allocation is averaged to produce a collectively intelligent outcome.</p>
     </div>
 
     <h3>Community Foundations Using Tiered Approaches</h3>

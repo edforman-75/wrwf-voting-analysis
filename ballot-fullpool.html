@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRWF Grants Ballot — Approach E: Full-Pool Dollar Allocation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+  :root {
+    --wrwf-teal: #2a7f7f;
+    --wrwf-teal-light: #e6f3f3;
+    --wrwf-teal-dark: #1d5c5c;
+    --wrwf-gold: #c8a951;
+    --wrwf-gold-light: #f5efd8;
+    --wrwf-cream: #faf8f3;
+    --wrwf-charcoal: #2d2d2d;
+    --wrwf-warm-gray: #6b6560;
+    --wrwf-border: #d4cfc7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--wrwf-cream); color: var(--wrwf-charcoal); line-height: 1.6; }
+  .ballot-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+  .back-link { display: inline-block; color: var(--wrwf-teal); text-decoration: none; font-size: 14px; margin-bottom: 16px; }
+  .back-link:hover { text-decoration: underline; }
+
+  .ballot-header { text-align: center; padding: 40px 20px 30px; border-bottom: 2px solid var(--wrwf-teal); margin-bottom: 30px; }
+  .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: var(--wrwf-teal); }
+  .logo-sub { font-size: 12px; font-weight: 500; color: var(--wrwf-warm-gray); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+  .ballot-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; margin-top: 20px; }
+  .ballot-year { font-size: 14px; color: var(--wrwf-warm-gray); margin-top: 4px; }
+  .badge { display: inline-block; background: var(--wrwf-teal-light); color: var(--wrwf-teal-dark); font-size: 12px; font-weight: 600; padding: 4px 14px; border-radius: 20px; margin-top: 12px; }
+
+  .instructions { background: white; border: 1px solid var(--wrwf-border); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  .instructions h2 { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--wrwf-teal-dark); margin-bottom: 12px; }
+  .instructions p { font-size: 15px; color: var(--wrwf-warm-gray); margin-bottom: 8px; }
+  .instructions .highlight { background: var(--wrwf-gold-light); border-left: 3px solid var(--wrwf-gold); padding: 12px 16px; margin-top: 12px; font-size: 14px; color: var(--wrwf-charcoal); }
+
+  /* STICKY BUDGET TRACKER */
+  .budget-tracker {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    border: 2px solid var(--wrwf-teal);
+    border-radius: 10px;
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  .budget-tracker-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .budget-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--wrwf-warm-gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .budget-amounts {
+    display: flex;
+    gap: 24px;
+    align-items: baseline;
+  }
+
+  .budget-figure { text-align: center; }
+
+  .budget-figure .amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 700;
+  }
+
+  .budget-figure .amount.remaining { color: var(--wrwf-teal); }
+  .budget-figure .amount.spent { color: var(--wrwf-gold); }
+  .budget-figure .amount.over { color: #c55; }
+
+  .budget-figure .sublabel {
+    font-size: 11px;
+    color: var(--wrwf-warm-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .budget-bar-wrapper { flex: 1; min-width: 200px; }
+
+  .budget-bar {
+    height: 12px;
+    background: #eee;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+
+  .budget-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.3s ease, background 0.3s ease;
+    background: var(--wrwf-teal);
+  }
+
+  .budget-bar-fill.warning { background: var(--wrwf-gold); }
+  .budget-bar-fill.over { background: #c55; }
+
+  /* Applicant cards */
+  .applicant-card {
+    background: white;
+    border: 1px solid var(--wrwf-border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+
+  .applicant-card:hover { box-shadow: 0 2px 12px rgba(42,127,127,0.1); }
+
+  .card-top { display: flex; align-items: flex-start; padding: 16px 24px 0; gap: 16px; }
+
+  .allocation-input {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .allocation-input label {
+    font-size: 11px;
+    color: var(--wrwf-warm-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .dollar-input-wrap {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--wrwf-border);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .dollar-input-wrap:focus-within { border-color: var(--wrwf-teal); }
+
+  .dollar-label {
+    padding: 0 8px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--wrwf-warm-gray);
+    background: #f8f6f2;
+  }
+
+  .dollar-input {
+    width: 100px;
+    height: 40px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--wrwf-teal-dark);
+    text-align: right;
+    padding-right: 8px;
+    outline: none;
+  }
+
+  .quick-amounts {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  .quick-btn {
+    font-size: 10px;
+    padding: 2px 6px;
+    border: 1px solid var(--wrwf-border);
+    border-radius: 4px;
+    background: white;
+    color: var(--wrwf-warm-gray);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .quick-btn:hover { background: var(--wrwf-teal-light); color: var(--wrwf-teal-dark); border-color: var(--wrwf-teal); }
+
+  .card-info { flex: 1; }
+  .org-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; }
+  .grant-amount { display: inline-block; font-size: 14px; font-weight: 600; color: var(--wrwf-teal); margin-top: 2px; }
+  .project-title { font-size: 13px; font-weight: 500; color: var(--wrwf-warm-gray); font-style: italic; }
+
+  .card-description { padding: 10px 24px 12px; font-size: 14px; color: #555; line-height: 1.6; }
+  .card-links { display: flex; gap: 16px; padding: 0 24px 14px; }
+  .card-links a { font-size: 13px; color: var(--wrwf-teal); text-decoration: none; font-weight: 500; }
+  .card-links a:hover { text-decoration: underline; }
+  .card-links a.video::before { content: '▶ '; }
+  .card-links a.transcript::before { content: '📄 '; }
+
+  .alloc-feedback {
+    padding: 0 24px 12px;
+    font-size: 12px;
+    color: var(--wrwf-warm-gray);
+    font-style: italic;
+  }
+
+  .submit-area { text-align: center; padding: 30px; margin-top: 20px; border-top: 2px solid var(--wrwf-teal); }
+  .submit-btn { background: var(--wrwf-teal); color: white; font-size: 16px; font-weight: 600; padding: 14px 48px; border: none; border-radius: 6px; cursor: pointer; }
+  .submit-btn:hover { background: var(--wrwf-teal-dark); }
+
+  .sample-banner { background: #2a6b8a; color: white; text-align: center; padding: 8px; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+
+  .improvement-note { background: #eef5ee; border: 1px solid #c2dbc2; border-radius: 6px; padding: 16px 20px; margin: 0 0 24px; font-size: 14px; color: #3a5d3a; }
+  .improvement-note strong { color: #2a6d2a; }
+
+  .tabulation-link {
+    display: block;
+    background: white;
+    border: 2px solid var(--wrwf-teal);
+    border-radius: 8px;
+    padding: 16px 24px;
+    text-align: center;
+    text-decoration: none;
+    margin-bottom: 24px;
+    transition: background 0.2s;
+  }
+  .tabulation-link:hover { background: var(--wrwf-teal-light); }
+  .tabulation-link h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--wrwf-teal-dark);
+    margin-bottom: 4px;
+  }
+  .tabulation-link p { font-size: 13px; color: var(--wrwf-warm-gray); margin: 0; }
+
+  @media (max-width: 640px) {
+    .budget-amounts { gap: 12px; }
+    .budget-figure .amount { font-size: 22px; }
+    .card-top { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sample-banner">⬥ SAMPLE BALLOT — APPROACH E: FULL-POOL DOLLAR ALLOCATION ⬥</div>
+
+<div class="ballot-container">
+
+  <a class='back-link' href='/'>← Back to Overview</a>
+
+  <div class="ballot-header">
+    <div class="logo-text">Wood River Women's Foundation</div>
+    <div class="logo-sub">Ketchum, Idaho &nbsp;·&nbsp; Est. 2005</div>
+    <div class="ballot-title">2026 Pooled Fund Grants Ballot</div>
+    <div class="ballot-year">Approach E — Full-Pool Dollar Allocation</div>
+    <div class="badge">Allocate $350,000 across applicants</div>
+  </div>
+
+  <div class="instructions">
+    <h2>Voting Instructions</h2>
+    <p>You are allocating the <strong>entire $350,000 grant pool</strong> across the 27 applicants below. Enter a dollar amount for each organization you wish to fund.</p>
+    <p>Your total allocations must equal exactly $350,000. The tracker at the top shows your remaining balance.</p>
+    <p>You may allocate any amount to any applicant — you're not limited to their requested amount. When all ballots are collected, <strong>each applicant's allocations will be averaged across all voters</strong> to produce the final grant amount.</p>
+    <div class="highlight">
+      <strong>What's different from the 100-point approach:</strong> Instead of abstract points, you're working in real dollars. If you allocate $25,000 to the Hunger Coalition, that's a direct statement about what you believe they should receive. The averaging across all voters produces a consensus funding level for each organization — the collective wisdom of the membership expressed in actual grant amounts.
+    </div>
+  </div>
+
+  <div class="improvement-note">
+    <strong>✦ Key insight:</strong> Voters think in concrete dollars rather than abstract points. There's no translation step between "what I allocated" and "what they receive." The average of all members' allocations directly produces each organization's grant amount.
+  </div>
+
+  <a href="tabulation-fullpool.html" class="tabulation-link">
+    <h3>📊 See How Tabulation Works</h3>
+    <p>View a demo showing how individual ballots are averaged to produce final grant amounts.</p>
+  </a>
+
+  <!-- STICKY BUDGET TRACKER -->
+  <div class="budget-tracker" id="budgetTracker">
+    <div class="budget-label">Your Dollar Allocation — $350,000 Pool</div>
+    <div class="budget-tracker-inner">
+      <div class="budget-amounts">
+        <div class="budget-figure">
+          <div class="amount remaining" id="remainingAmount">$350,000</div>
+          <div class="sublabel">Remaining</div>
+        </div>
+        <div class="budget-figure">
+          <div class="amount spent" id="spentAmount">$0</div>
+          <div class="sublabel">Allocated</div>
+        </div>
+      </div>
+      <div class="budget-bar-wrapper">
+        <div class="budget-bar">
+          <div class="budget-bar-fill" id="budgetBarFill" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Applicant cards -->
+  <div class="applicant-card">
+    <div class="card-top">
+      <div class="allocation-input">
+        <label>Grant $</label>
+        <div class="dollar-input-wrap">
+          <span class="dollar-label">$</span>
+          <input type="number" class="dollar-input alloc-input" min="0" max="350000" step="1000" value="0" data-request="25000" placeholder="0">
+        </div>
+        <div class="quick-amounts">
+          <button class="quick-btn" onclick="setAmount(this, 5000)">$5K</button>
+          <button class="quick-btn" onclick="setAmount(this, 15000)">$15K</button>
+          <button class="quick-btn" onclick="setAmount(this, 25000)">$25K</button>
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">The Hunger Coalition</div>
+        <div class="grant-amount">Requesting: $25,000</div>
+        <div class="project-title">Expanding Emergency Food Distribution in South County</div>
+      </div>
+    </div>
+    <div class="card-description">Provides food assistance to 3,000+ families annually. This grant funds a new refrigerated distribution hub in Bellevue for south-county families who currently travel 30+ miles.</div>
+    <div class="alloc-feedback" id="feedback0">$0 allocated (requesting $25,000).</div>
+    <div class="card-links">
+      <a href="#" class="video">Watch 5-Min Presentation</a>
+      <a href="#" class="transcript">Read Transcript</a>
+    </div>
+  </div>
+
+  <div class="applicant-card">
+    <div class="card-top">
+      <div class="allocation-input">
+        <label>Grant $</label>
+        <div class="dollar-input-wrap">
+          <span class="dollar-label">$</span>
+          <input type="number" class="dollar-input alloc-input" min="0" max="350000" step="1000" value="0" data-request="8400" placeholder="0">
+        </div>
+        <div class="quick-amounts">
+          <button class="quick-btn" onclick="setAmount(this, 5000)">$5K</button>
+          <button class="quick-btn" onclick="setAmount(this, 15000)">$15K</button>
+          <button class="quick-btn" onclick="setAmount(this, 25000)">$25K</button>
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">Smiley Creek Fire Protection District</div>
+        <div class="grant-amount">Requesting: $8,400</div>
+        <div class="project-title">AED Equipment for Remote North Valley</div>
+      </div>
+    </div>
+    <div class="card-description">Serves a remote area with 45-minute emergency response times. This grant places four AEDs in community locations and trains 60 volunteers.</div>
+    <div class="alloc-feedback" id="feedback1">$0 allocated (requesting $8,400).</div>
+    <div class="card-links">
+      <a href="#" class="video">Watch 5-Min Presentation</a>
+      <a href="#" class="transcript">Read Transcript</a>
+    </div>
+  </div>
+
+  <div class="applicant-card">
+    <div class="card-top">
+      <div class="allocation-input">
+        <label>Grant $</label>
+        <div class="dollar-input-wrap">
+          <span class="dollar-label">$</span>
+          <input type="number" class="dollar-input alloc-input" min="0" max="350000" step="1000" value="0" data-request="5000" placeholder="0">
+        </div>
+        <div class="quick-amounts">
+          <button class="quick-btn" onclick="setAmount(this, 5000)">$5K</button>
+          <button class="quick-btn" onclick="setAmount(this, 15000)">$15K</button>
+          <button class="quick-btn" onclick="setAmount(this, 25000)">$25K</button>
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">Project 208 FC</div>
+        <div class="grant-amount">Requesting: $5,000</div>
+        <div class="project-title">Youth Mentorship Through Soccer</div>
+      </div>
+    </div>
+    <div class="card-description">Uses soccer for mentorship among underserved youth. Funds scholarships for 40 children, coaching stipends, equipment, and transportation. Primarily serves Spanish-speaking families.</div>
+    <div class="alloc-feedback" id="feedback2">$0 allocated (requesting $5,000).</div>
+    <div class="card-links">
+      <a href="#" class="video">Watch 5-Min Presentation</a>
+      <a href="#" class="transcript">Read Transcript</a>
+    </div>
+  </div>
+
+  <div class="applicant-card">
+    <div class="card-top">
+      <div class="allocation-input">
+        <label>Grant $</label>
+        <div class="dollar-input-wrap">
+          <span class="dollar-label">$</span>
+          <input type="number" class="dollar-input alloc-input" min="0" max="350000" step="1000" value="0" data-request="25000" placeholder="0">
+        </div>
+        <div class="quick-amounts">
+          <button class="quick-btn" onclick="setAmount(this, 5000)">$5K</button>
+          <button class="quick-btn" onclick="setAmount(this, 15000)">$15K</button>
+          <button class="quick-btn" onclick="setAmount(this, 25000)">$25K</button>
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">NAMI Wood River Valley</div>
+        <div class="grant-amount">Requesting: $25,000</div>
+        <div class="project-title">Preventative Mental Health & Support Groups</div>
+      </div>
+    </div>
+    <div class="card-description">Provides free mental health education and support groups. This grant expands youth programming to all three valley middle schools and launches a bilingual family support program.</div>
+    <div class="alloc-feedback" id="feedback3">$0 allocated (requesting $25,000).</div>
+    <div class="card-links">
+      <a href="#" class="video">Watch 5-Min Presentation</a>
+      <a href="#" class="transcript">Read Transcript</a>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding: 24px; color: var(--wrwf-warm-gray); font-style: italic; font-size: 14px;">
+    — 23 additional applicants would appear here —
+  </div>
+
+  <div class="submit-area">
+    <div style="background: #fff8f0; border: 1px solid #e8d4b8; border-left: 4px solid #c8890a; border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+      <div style="font-weight: 600; color: #8a5d00; margin-bottom: 6px;">⚠ Your ballot is final once submitted</div>
+      <div style="font-size: 14px; color: #6b5a3e; line-height: 1.5;">
+        To protect the secrecy of your vote, <strong>submitted ballots cannot be changed, retrieved, or resubmitted.</strong> Your ballot will be permanently separated from your identity at the moment of submission. Please review your allocations carefully before submitting. You will receive a unique receipt code to verify your ballot was counted.
+      </div>
+    </div>
+    <div style="font-size: 13px; color: var(--wrwf-warm-gray); margin-bottom: 14px;">You may save your work and return as many times as you like before submitting. The ballot closes on March 26, 2026.</div>
+    <button class="submit-btn" id="submitBtn">Submit My Ballot</button>
+  </div>
+</div>
+
+<script>
+const POOL = 350000;
+const inputs = document.querySelectorAll('.alloc-input');
+
+function fmt(n) {
+  return '$' + n.toLocaleString();
+}
+
+function setAmount(btn, amount) {
+  const input = btn.closest('.allocation-input').querySelector('.alloc-input');
+  input.value = amount;
+  updateBudget();
+}
+
+function updateBudget() {
+  let spent = 0;
+  inputs.forEach((input, i) => {
+    const val = parseInt(input.value) || 0;
+    spent += val;
+    const request = parseInt(input.dataset.request);
+    const fb = document.getElementById('feedback' + i);
+    if (fb) {
+      const pctOfRequest = request > 0 ? Math.round((val / request) * 100) : 0;
+      if (val === 0) {
+        fb.textContent = `$0 allocated (requesting ${fmt(request)}).`;
+      } else if (val === request) {
+        fb.textContent = `${fmt(val)} allocated — exactly the requested amount.`;
+      } else if (val > request) {
+        fb.textContent = `${fmt(val)} allocated — ${pctOfRequest}% of the ${fmt(request)} request.`;
+      } else {
+        fb.textContent = `${fmt(val)} allocated — ${pctOfRequest}% of the ${fmt(request)} request.`;
+      }
+    }
+  });
+
+  const remaining = POOL - spent;
+  document.getElementById('remainingAmount').textContent = fmt(remaining);
+  document.getElementById('spentAmount').textContent = fmt(spent);
+
+  const pct = Math.min((spent / POOL) * 100, 100);
+  const bar = document.getElementById('budgetBarFill');
+  bar.style.width = pct + '%';
+
+  const remEl = document.getElementById('remainingAmount');
+  bar.className = 'budget-bar-fill';
+  remEl.className = 'amount remaining';
+
+  if (remaining < 0) {
+    bar.classList.add('over');
+    remEl.classList.remove('remaining');
+    remEl.classList.add('over');
+  } else if (remaining < 50000) {
+    bar.classList.add('warning');
+  }
+}
+
+inputs.forEach(input => {
+  input.addEventListener('input', updateBudget);
+  input.addEventListener('change', updateBudget);
+});
+</script>
+</body>
+</html>
