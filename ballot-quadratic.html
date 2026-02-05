@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRWF Grants Ballot — Approach C: Quadratic Voting</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+  :root {
+    --wrwf-teal: #2a7f7f;
+    --wrwf-teal-light: #e6f3f3;
+    --wrwf-teal-dark: #1d5c5c;
+    --wrwf-gold: #c8a951;
+    --wrwf-gold-light: #f5efd8;
+    --wrwf-cream: #faf8f3;
+    --wrwf-charcoal: #2d2d2d;
+    --wrwf-warm-gray: #6b6560;
+    --wrwf-border: #d4cfc7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--wrwf-cream); color: var(--wrwf-charcoal); line-height: 1.6; }
+  .ballot-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+  .back-link { display: inline-block; color: var(--wrwf-teal); text-decoration: none; font-size: 14px; margin-bottom: 16px; }
+  .back-link:hover { text-decoration: underline; }
+
+  .ballot-header { text-align: center; padding: 40px 20px 30px; border-bottom: 2px solid var(--wrwf-teal); margin-bottom: 30px; }
+  .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: var(--wrwf-teal); }
+  .logo-sub { font-size: 12px; font-weight: 500; color: var(--wrwf-warm-gray); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+  .ballot-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; margin-top: 20px; }
+  .ballot-year { font-size: 14px; color: var(--wrwf-warm-gray); margin-top: 4px; }
+  .badge { display: inline-block; background: var(--wrwf-teal-light); color: var(--wrwf-teal-dark); font-size: 12px; font-weight: 600; padding: 4px 14px; border-radius: 20px; margin-top: 12px; }
+
+  .instructions { background: white; border: 1px solid var(--wrwf-border); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  .instructions h2 { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--wrwf-teal-dark); margin-bottom: 12px; }
+  .instructions p { font-size: 15px; color: var(--wrwf-warm-gray); margin-bottom: 8px; }
+  .instructions .highlight { background: var(--wrwf-gold-light); border-left: 3px solid var(--wrwf-gold); padding: 12px 16px; margin-top: 12px; font-size: 14px; color: var(--wrwf-charcoal); }
+
+  .cost-guide { background: white; border: 1px solid var(--wrwf-border); border-radius: 8px; padding: 20px 24px; margin-bottom: 24px; }
+  .cost-guide h3 { font-family: 'Cormorant Garamond', serif; font-size: 16px; font-weight: 700; color: var(--wrwf-teal-dark); margin-bottom: 12px; }
+  .cost-table { display: flex; flex-wrap: wrap; gap: 12px; }
+  .cost-item { background: var(--wrwf-teal-light); padding: 8px 14px; border-radius: 6px; font-size: 13px; }
+  .cost-item strong { color: var(--wrwf-teal-dark); }
+
+  .budget-tracker {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    border: 2px solid var(--wrwf-teal);
+    border-radius: 10px;
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  .budget-tracker-inner { display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+  .budget-label { font-family: 'Cormorant Garamond', serif; font-size: 14px; font-weight: 600; color: var(--wrwf-warm-gray); text-transform: uppercase; letter-spacing: 1px; }
+  .budget-amounts { display: flex; gap: 24px; align-items: baseline; }
+  .budget-figure { text-align: center; }
+  .budget-figure .amount { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 700; }
+  .budget-figure .amount.remaining { color: var(--wrwf-teal); }
+  .budget-figure .amount.spent { color: var(--wrwf-gold); }
+  .budget-figure .amount.over { color: #c55; }
+  .budget-figure .sublabel { font-size: 11px; color: var(--wrwf-warm-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+  .budget-bar-wrapper { flex: 1; min-width: 200px; }
+  .budget-bar { height: 12px; background: #eee; border-radius: 6px; overflow: hidden; }
+  .budget-bar-fill { height: 100%; border-radius: 6px; transition: width 0.3s ease; background: var(--wrwf-teal); }
+
+  .applicant-card { background: white; border: 1px solid var(--wrwf-border); border-radius: 8px; margin-bottom: 16px; overflow: hidden; transition: box-shadow 0.2s; }
+  .applicant-card:hover { box-shadow: 0 2px 12px rgba(42,127,127,0.1); }
+
+  .card-top { display: flex; align-items: flex-start; padding: 16px 24px 0; gap: 16px; }
+
+  .vote-input { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+  .vote-input label { font-size: 11px; color: var(--wrwf-warm-gray); text-transform: uppercase; letter-spacing: 0.5px; }
+  .vote-controls { display: flex; align-items: center; gap: 8px; }
+  .vote-btn { width: 36px; height: 36px; border: 2px solid var(--wrwf-border); background: white; border-radius: 6px; font-size: 18px; cursor: pointer; color: var(--wrwf-teal); transition: all 0.15s; }
+  .vote-btn:hover { background: var(--wrwf-teal-light); border-color: var(--wrwf-teal); }
+  .vote-count { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: var(--wrwf-teal-dark); min-width: 40px; text-align: center; }
+  .vote-sublabel { font-size: 10px; color: var(--wrwf-warm-gray); }
+  .vote-cost { font-size: 12px; color: var(--wrwf-gold); font-weight: 600; margin-top: 2px; }
+
+  .card-info { flex: 1; }
+  .org-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; }
+  .grant-amount { display: inline-block; font-size: 14px; font-weight: 600; color: var(--wrwf-teal); margin-top: 2px; }
+  .project-title { font-size: 13px; font-weight: 500; color: var(--wrwf-warm-gray); font-style: italic; }
+
+  .card-description { padding: 10px 24px 12px; font-size: 14px; color: #555; line-height: 1.6; }
+  .card-links { display: flex; gap: 16px; padding: 0 24px 14px; }
+  .card-links a { font-size: 13px; color: var(--wrwf-teal); text-decoration: none; font-weight: 500; }
+  .card-links a:hover { text-decoration: underline; }
+
+  .submit-area { text-align: center; padding: 30px; margin-top: 20px; border-top: 2px solid var(--wrwf-teal); }
+  .submit-btn { background: var(--wrwf-teal); color: white; font-size: 16px; font-weight: 600; padding: 14px 48px; border: none; border-radius: 6px; cursor: pointer; }
+  .submit-btn:hover { background: var(--wrwf-teal-dark); }
+
+  .sample-banner { background: #7a4a9e; color: white; text-align: center; padding: 8px; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+
+  .improvement-note { background: #eef5ee; border: 1px solid #c2dbc2; border-radius: 6px; padding: 16px 20px; margin: 0 0 24px; font-size: 14px; color: #3a5d3a; }
+  .improvement-note strong { color: #2a6d2a; }
+
+  @media (max-width: 640px) {
+    .budget-amounts { gap: 12px; }
+    .budget-figure .amount { font-size: 24px; }
+    .card-top { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sample-banner">SAMPLE BALLOT — APPROACH C: QUADRATIC VOTING</div>
+
+<div class="ballot-container">
+
+  <a class='back-link' href='/'>← Back to Overview</a>
+
+  <div class="ballot-header">
+    <div class="logo-text">Wood River Women's Foundation</div>
+    <div class="logo-sub">Ketchum, Idaho · Est. 2005</div>
+    <div class="ballot-title">2026 Pooled Fund Grants Ballot</div>
+    <div class="ballot-year">Approach C — Quadratic Voting</div>
+    <div class="badge">You have 100 voice credits to spend</div>
+  </div>
+
+  <div class="instructions">
+    <h2>Voting Instructions</h2>
+    <p>You have <strong>100 voice credits</strong> to express your preferences. Each "vote" for an applicant costs credits based on how many votes you give them:</p>
+    <p>The <strong>first vote</strong> costs 1 credit. The <strong>second vote</strong> costs 3 more (4 total). The <strong>third vote</strong> costs 5 more (9 total). And so on.</p>
+    <div class="highlight">
+      <strong>Why quadratic?</strong> This system lets you express <em>how strongly</em> you feel. But expressing very strong preferences is expensive — giving 10 votes to one applicant uses all 100 credits. This naturally balances passionate supporters against broader consensus.
+    </div>
+  </div>
+
+  <div class="cost-guide">
+    <h3>Voice Credit Cost Guide</h3>
+    <div class="cost-table">
+      <div class="cost-item"><strong>1 vote</strong> = 1 credit</div>
+      <div class="cost-item"><strong>2 votes</strong> = 4 credits</div>
+      <div class="cost-item"><strong>3 votes</strong> = 9 credits</div>
+      <div class="cost-item"><strong>4 votes</strong> = 16 credits</div>
+      <div class="cost-item"><strong>5 votes</strong> = 25 credits</div>
+      <div class="cost-item"><strong>6 votes</strong> = 36 credits</div>
+      <div class="cost-item"><strong>7 votes</strong> = 49 credits</div>
+      <div class="cost-item"><strong>8 votes</strong> = 64 credits</div>
+      <div class="cost-item"><strong>9 votes</strong> = 81 credits</div>
+      <div class="cost-item"><strong>10 votes</strong> = 100 credits</div>
+    </div>
+  </div>
+
+  <div class="improvement-note">
+    <strong>Key improvement:</strong> Prevents single-issue voters from dominating. A member who cares deeply about one organization can show that, but the cost ensures they can't give 10 votes to 10 different organizations.
+  </div>
+
+  <div class="budget-tracker">
+    <div class="budget-label">Your Voice Credits</div>
+    <div class="budget-tracker-inner">
+      <div class="budget-amounts">
+        <div class="budget-figure">
+          <div class="amount remaining" id="remainingAmount">100</div>
+          <div class="sublabel">Credits Remaining</div>
+        </div>
+        <div class="budget-figure">
+          <div class="amount spent" id="spentAmount">0</div>
+          <div class="sublabel">Credits Spent</div>
+        </div>
+      </div>
+      <div class="budget-bar-wrapper">
+        <div class="budget-bar">
+          <div class="budget-bar-fill" id="budgetBarFill" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="applicant-card" data-votes="0">
+    <div class="card-top">
+      <div class="vote-input">
+        <label>Votes</label>
+        <div class="vote-controls">
+          <button class="vote-btn minus">−</button>
+          <div class="vote-count">0</div>
+          <button class="vote-btn plus">+</button>
+        </div>
+        <div class="vote-cost">Cost: 0 credits</div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">The Hunger Coalition</div>
+        <div class="grant-amount">Requesting: $25,000</div>
+        <div class="project-title">Expanding Emergency Food Distribution in South County</div>
+      </div>
+    </div>
+    <div class="card-description">Provides food assistance to 3,000+ families annually. This grant funds a new refrigerated distribution hub in Bellevue for south-county families who currently travel 30+ miles.</div>
+    <div class="card-links">
+      <a href="#">▶ Watch 5-Min Presentation</a>
+      <a href="#">📄 Read Transcript</a>
+    </div>
+  </div>
+
+  <div class="applicant-card" data-votes="0">
+    <div class="card-top">
+      <div class="vote-input">
+        <label>Votes</label>
+        <div class="vote-controls">
+          <button class="vote-btn minus">−</button>
+          <div class="vote-count">0</div>
+          <button class="vote-btn plus">+</button>
+        </div>
+        <div class="vote-cost">Cost: 0 credits</div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">Smiley Creek Fire Protection District</div>
+        <div class="grant-amount">Requesting: $8,400</div>
+        <div class="project-title">AED Equipment for Remote North Valley</div>
+      </div>
+    </div>
+    <div class="card-description">Serves a remote area with 45-minute emergency response times. This grant places four AEDs in community locations and trains 60 volunteers.</div>
+    <div class="card-links">
+      <a href="#">▶ Watch 5-Min Presentation</a>
+      <a href="#">📄 Read Transcript</a>
+    </div>
+  </div>
+
+  <div class="applicant-card" data-votes="0">
+    <div class="card-top">
+      <div class="vote-input">
+        <label>Votes</label>
+        <div class="vote-controls">
+          <button class="vote-btn minus">−</button>
+          <div class="vote-count">0</div>
+          <button class="vote-btn plus">+</button>
+        </div>
+        <div class="vote-cost">Cost: 0 credits</div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">Project 208 FC</div>
+        <div class="grant-amount">Requesting: $5,000</div>
+        <div class="project-title">Youth Mentorship Through Soccer</div>
+      </div>
+    </div>
+    <div class="card-description">Uses soccer for mentorship among underserved youth. Funds scholarships for 40 children, coaching stipends, equipment, and transportation. Primarily serves Spanish-speaking families.</div>
+    <div class="card-links">
+      <a href="#">▶ Watch 5-Min Presentation</a>
+      <a href="#">📄 Read Transcript</a>
+    </div>
+  </div>
+
+  <div class="applicant-card" data-votes="0">
+    <div class="card-top">
+      <div class="vote-input">
+        <label>Votes</label>
+        <div class="vote-controls">
+          <button class="vote-btn minus">−</button>
+          <div class="vote-count">0</div>
+          <button class="vote-btn plus">+</button>
+        </div>
+        <div class="vote-cost">Cost: 0 credits</div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">NAMI Wood River Valley</div>
+        <div class="grant-amount">Requesting: $25,000</div>
+        <div class="project-title">Preventative Mental Health & Support Groups</div>
+      </div>
+    </div>
+    <div class="card-description">Provides free mental health education and support groups. This grant expands youth programming to all three valley middle schools and launches a bilingual family support program.</div>
+    <div class="card-links">
+      <a href="#">▶ Watch 5-Min Presentation</a>
+      <a href="#">📄 Read Transcript</a>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding: 24px; color: var(--wrwf-warm-gray); font-style: italic; font-size: 14px;">
+    — 23 additional applicants would appear here —
+  </div>
+
+  <div class="submit-area">
+    <div style="background: #fff8f0; border: 1px solid #e8d4b8; border-left: 4px solid #c8890a; border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+      <div style="font-weight: 600; color: #8a5d00; margin-bottom: 6px;">Your ballot is final once submitted</div>
+      <div style="font-size: 14px; color: #6b5a3e; line-height: 1.5;">
+        Submitted ballots cannot be changed, retrieved, or resubmitted. You will receive a receipt code to verify your ballot was counted.
+      </div>
+    </div>
+    <button class="submit-btn">Submit My Ballot</button>
+  </div>
+</div>
+
+<script>
+const BUDGET = 100;
+const cards = document.querySelectorAll('.applicant-card');
+
+function quadraticCost(votes) {
+  return votes * votes;
+}
+
+function updateBudget() {
+  let spent = 0;
+  cards.forEach(card => {
+    const votes = parseInt(card.dataset.votes) || 0;
+    spent += quadraticCost(votes);
+  });
+
+  const remaining = BUDGET - spent;
+  document.getElementById('remainingAmount').textContent = remaining;
+  document.getElementById('spentAmount').textContent = spent;
+
+  const pct = Math.min((spent / BUDGET) * 100, 100);
+  document.getElementById('budgetBarFill').style.width = pct + '%';
+
+  const remEl = document.getElementById('remainingAmount');
+  if (remaining < 0) {
+    remEl.className = 'amount over';
+  } else {
+    remEl.className = 'amount remaining';
+  }
+}
+
+cards.forEach(card => {
+  const minusBtn = card.querySelector('.minus');
+  const plusBtn = card.querySelector('.plus');
+  const countEl = card.querySelector('.vote-count');
+  const costEl = card.querySelector('.vote-cost');
+
+  minusBtn.addEventListener('click', () => {
+    let votes = parseInt(card.dataset.votes) || 0;
+    if (votes > 0) {
+      votes--;
+      card.dataset.votes = votes;
+      countEl.textContent = votes;
+      costEl.textContent = 'Cost: ' + quadraticCost(votes) + ' credits';
+      updateBudget();
+    }
+  });
+
+  plusBtn.addEventListener('click', () => {
+    let votes = parseInt(card.dataset.votes) || 0;
+    const newCost = quadraticCost(votes + 1);
+    let currentSpent = 0;
+    cards.forEach(c => currentSpent += quadraticCost(parseInt(c.dataset.votes) || 0));
+
+    if (currentSpent - quadraticCost(votes) + newCost <= BUDGET) {
+      votes++;
+      card.dataset.votes = votes;
+      countEl.textContent = votes;
+      costEl.textContent = 'Cost: ' + newCost + ' credits';
+      updateBudget();
+    }
+  });
+});
+</script>
+</body>
+</html>

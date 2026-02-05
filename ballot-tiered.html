@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRWF Grants Ballot — Approach D: Tiered Allocation</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+  :root {
+    --wrwf-teal: #2a7f7f;
+    --wrwf-teal-light: #e6f3f3;
+    --wrwf-teal-dark: #1d5c5c;
+    --wrwf-gold: #c8a951;
+    --wrwf-gold-light: #f5efd8;
+    --wrwf-cream: #faf8f3;
+    --wrwf-charcoal: #2d2d2d;
+    --wrwf-warm-gray: #6b6560;
+    --wrwf-border: #d4cfc7;
+    --tier-small: #4a90a4;
+    --tier-medium: #6b7a3d;
+    --tier-large: #8b5a2b;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--wrwf-cream); color: var(--wrwf-charcoal); line-height: 1.6; }
+  .ballot-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+  .back-link { display: inline-block; color: var(--wrwf-teal); text-decoration: none; font-size: 14px; margin-bottom: 16px; }
+  .back-link:hover { text-decoration: underline; }
+
+  .ballot-header { text-align: center; padding: 40px 20px 30px; border-bottom: 2px solid var(--wrwf-teal); margin-bottom: 30px; }
+  .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: var(--wrwf-teal); }
+  .logo-sub { font-size: 12px; font-weight: 500; color: var(--wrwf-warm-gray); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+  .ballot-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; margin-top: 20px; }
+  .ballot-year { font-size: 14px; color: var(--wrwf-warm-gray); margin-top: 4px; }
+  .badge { display: inline-block; background: var(--wrwf-teal-light); color: var(--wrwf-teal-dark); font-size: 12px; font-weight: 600; padding: 4px 14px; border-radius: 20px; margin-top: 12px; }
+
+  .instructions { background: white; border: 1px solid var(--wrwf-border); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  .instructions h2 { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--wrwf-teal-dark); margin-bottom: 12px; }
+  .instructions p { font-size: 15px; color: var(--wrwf-warm-gray); margin-bottom: 8px; }
+  .instructions .highlight { background: var(--wrwf-gold-light); border-left: 3px solid var(--wrwf-gold); padding: 12px 16px; margin-top: 12px; font-size: 14px; color: var(--wrwf-charcoal); }
+
+  .tier-section { margin-bottom: 32px; }
+  .tier-header { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-radius: 8px 8px 0 0; color: white; }
+  .tier-header.small { background: var(--tier-small); }
+  .tier-header.medium { background: var(--tier-medium); }
+  .tier-header.large { background: var(--tier-large); }
+  .tier-header h3 { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; }
+  .tier-header .tier-info { font-size: 13px; opacity: 0.9; }
+  .tier-progress { margin-left: auto; background: rgba(255,255,255,0.2); padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 600; }
+
+  .tier-body { background: white; border: 1px solid var(--wrwf-border); border-top: none; border-radius: 0 0 8px 8px; padding: 16px; }
+
+  .applicant-row { display: flex; align-items: center; gap: 16px; padding: 14px 16px; border: 1px solid var(--wrwf-border); border-radius: 6px; margin-bottom: 10px; background: #fefefe; transition: all 0.2s; }
+  .applicant-row:hover { border-color: var(--wrwf-teal); }
+  .applicant-row.selected { background: var(--wrwf-teal-light); border-color: var(--wrwf-teal); }
+
+  .rank-selector { flex-shrink: 0; }
+  .rank-selector select { font-size: 14px; padding: 8px 12px; border: 2px solid var(--wrwf-border); border-radius: 6px; background: white; cursor: pointer; min-width: 80px; }
+  .rank-selector select:focus { border-color: var(--wrwf-teal); outline: none; }
+
+  .applicant-info { flex: 1; }
+  .org-name { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 700; }
+  .grant-details { font-size: 13px; color: var(--wrwf-warm-gray); margin-top: 2px; }
+  .grant-details .amount { color: var(--wrwf-teal); font-weight: 600; }
+
+  .applicant-links { display: flex; gap: 12px; }
+  .applicant-links a { font-size: 12px; color: var(--wrwf-teal); text-decoration: none; }
+  .applicant-links a:hover { text-decoration: underline; }
+
+  .submit-area { text-align: center; padding: 30px; margin-top: 20px; border-top: 2px solid var(--wrwf-teal); }
+  .submit-btn { background: var(--wrwf-teal); color: white; font-size: 16px; font-weight: 600; padding: 14px 48px; border: none; border-radius: 6px; cursor: pointer; }
+  .submit-btn:hover { background: var(--wrwf-teal-dark); }
+
+  .sample-banner { background: #5a8a4a; color: white; text-align: center; padding: 8px; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+
+  .improvement-note { background: #eef5ee; border: 1px solid #c2dbc2; border-radius: 6px; padding: 16px 20px; margin: 0 0 24px; font-size: 14px; color: #3a5d3a; }
+  .improvement-note strong { color: #2a6d2a; }
+
+  @media (max-width: 640px) {
+    .applicant-row { flex-direction: column; align-items: flex-start; }
+    .applicant-links { margin-top: 8px; }
+    .tier-header { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sample-banner">SAMPLE BALLOT — APPROACH D: TIERED ALLOCATION</div>
+
+<div class="ballot-container">
+
+  <a class='back-link' href='/'>← Back to Overview</a>
+
+  <div class="ballot-header">
+    <div class="logo-text">Wood River Women's Foundation</div>
+    <div class="logo-sub">Ketchum, Idaho · Est. 2005</div>
+    <div class="ballot-title">2026 Pooled Fund Grants Ballot</div>
+    <div class="ballot-year">Approach D — Tiered Allocation</div>
+    <div class="badge">Rank your top 5 in each tier</div>
+  </div>
+
+  <div class="instructions">
+    <h2>Voting Instructions</h2>
+    <p>Applicants are grouped by grant size into three tiers. Within each tier, <strong>rank your top 5 choices</strong> from 1 (highest priority) to 5.</p>
+    <p>You don't need to rank all applicants — just your top 5 in each tier. You can skip tiers if you don't have preferences.</p>
+    <div class="highlight">
+      <strong>Why tiers?</strong> This ensures small organizations compete against other small requests, not against large flagship projects. A $5,000 youth soccer program won't be drowned out by a $25,000 food bank request — they're in different pools.
+    </div>
+  </div>
+
+  <div class="improvement-note">
+    <strong>Key improvement:</strong> Prevents large-request organizations from absorbing all the funding. Each tier has its own allocation, ensuring diversity in grant sizes.
+  </div>
+
+  <!-- SMALL TIER -->
+  <div class="tier-section">
+    <div class="tier-header small">
+      <h3>Small Grants</h3>
+      <div class="tier-info">$5,000 – $10,000 · 9 applicants</div>
+      <div class="tier-progress">0 of 5 ranked</div>
+    </div>
+    <div class="tier-body">
+      <div class="applicant-row">
+        <div class="rank-selector">
+          <select>
+            <option value="">—</option>
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+          </select>
+        </div>
+        <div class="applicant-info">
+          <div class="org-name">Project 208 FC</div>
+          <div class="grant-details"><span class="amount">$5,000</span> · Youth Mentorship Through Soccer</div>
+        </div>
+        <div class="applicant-links">
+          <a href="#">▶ Video</a>
+          <a href="#">📄 Transcript</a>
+        </div>
+      </div>
+
+      <div class="applicant-row">
+        <div class="rank-selector">
+          <select>
+            <option value="">—</option>
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+          </select>
+        </div>
+        <div class="applicant-info">
+          <div class="org-name">Smiley Creek Fire Protection District</div>
+          <div class="grant-details"><span class="amount">$8,400</span> · AED Equipment for Remote North Valley</div>
+        </div>
+        <div class="applicant-links">
+          <a href="#">▶ Video</a>
+          <a href="#">📄 Transcript</a>
+        </div>
+      </div>
+
+      <div class="applicant-row">
+        <div class="rank-selector">
+          <select>
+            <option value="">—</option>
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+          </select>
+        </div>
+        <div class="applicant-info">
+          <div class="org-name">Advocates for Survivors of DV</div>
+          <div class="grant-details"><span class="amount">$10,000</span> · Emergency Housing Assistance</div>
+        </div>
+        <div class="applicant-links">
+          <a href="#">▶ Video</a>
+          <a href="#">📄 Transcript</a>
+        </div>
+      </div>
+
+      <div style="text-align:center; padding: 12px; color: var(--wrwf-warm-gray); font-style: italic; font-size: 13px;">
+        — 6 more small-tier applicants —
+      </div>
+    </div>
+  </div>
+
+  <!-- MEDIUM TIER -->
+  <div class="tier-section">
+    <div class="tier-header medium">
+      <h3>Medium Grants</h3>
+      <div class="tier-info">$10,001 – $17,500 · 8 applicants</div>
+      <div class="tier-progress">0 of 5 ranked</div>
+    </div>
+    <div class="tier-body">
+      <div class="applicant-row">
+        <div class="rank-selector">
+          <select>
+            <option value="">—</option>
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+          </select>
+        </div>
+        <div class="applicant-info">
+          <div class="org-name">Blaine County Senior Connection</div>
+          <div class="grant-details"><span class="amount">$15,000</span> · Meals on Wheels Expansion</div>
+        </div>
+        <div class="applicant-links">
+          <a href="#">▶ Video</a>
+          <a href="#">📄 Transcript</a>
+        </div>
+      </div>
+
+      <div class="applicant-row">
+        <div class="rank-selector">
+          <select>
+            <option value="">—</option>
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+          </select>
+        </div>
+        <div class="applicant-info">
+          <div class="org-name">Wood River Land Trust</div>
+          <div class="grant-details"><span class="amount">$12,500</span> · Youth Conservation Corps</div>
+        </div>
+        <div class="applicant-links">
+          <a href="#">▶ Video</a>
+          <a href="#">📄 Transcript</a>
+        </div>
+      </div>
+
+      <div style="text-align:center; padding: 12px; color: var(--wrwf-warm-gray); font-style: italic; font-size: 13px;">
+        — 6 more medium-tier applicants —
+      </div>
+    </div>
+  </div>
+
+  <!-- LARGE TIER -->
+  <div class="tier-section">
+    <div class="tier-header large">
+      <h3>Large Grants</h3>
+      <div class="tier-info">$17,501 – $25,000 · 10 applicants</div>
+      <div class="tier-progress">0 of 5 ranked</div>
+    </div>
+    <div class="tier-body">
+      <div class="applicant-row">
+        <div class="rank-selector">
+          <select>
+            <option value="">—</option>
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+          </select>
+        </div>
+        <div class="applicant-info">
+          <div class="org-name">The Hunger Coalition</div>
+          <div class="grant-details"><span class="amount">$25,000</span> · Emergency Food Distribution in South County</div>
+        </div>
+        <div class="applicant-links">
+          <a href="#">▶ Video</a>
+          <a href="#">📄 Transcript</a>
+        </div>
+      </div>
+
+      <div class="applicant-row">
+        <div class="rank-selector">
+          <select>
+            <option value="">—</option>
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+          </select>
+        </div>
+        <div class="applicant-info">
+          <div class="org-name">NAMI Wood River Valley</div>
+          <div class="grant-details"><span class="amount">$25,000</span> · Preventative Mental Health & Support Groups</div>
+        </div>
+        <div class="applicant-links">
+          <a href="#">▶ Video</a>
+          <a href="#">📄 Transcript</a>
+        </div>
+      </div>
+
+      <div class="applicant-row">
+        <div class="rank-selector">
+          <select>
+            <option value="">—</option>
+            <option value="1">1st</option>
+            <option value="2">2nd</option>
+            <option value="3">3rd</option>
+            <option value="4">4th</option>
+            <option value="5">5th</option>
+          </select>
+        </div>
+        <div class="applicant-info">
+          <div class="org-name">Blaine County Housing Authority</div>
+          <div class="grant-details"><span class="amount">$20,000</span> · Workforce Housing Down Payment Assistance</div>
+        </div>
+        <div class="applicant-links">
+          <a href="#">▶ Video</a>
+          <a href="#">📄 Transcript</a>
+        </div>
+      </div>
+
+      <div style="text-align:center; padding: 12px; color: var(--wrwf-warm-gray); font-style: italic; font-size: 13px;">
+        — 7 more large-tier applicants —
+      </div>
+    </div>
+  </div>
+
+  <div class="submit-area">
+    <div style="background: #fff8f0; border: 1px solid #e8d4b8; border-left: 4px solid #c8890a; border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+      <div style="font-weight: 600; color: #8a5d00; margin-bottom: 6px;">Your ballot is final once submitted</div>
+      <div style="font-size: 14px; color: #6b5a3e; line-height: 1.5;">
+        Submitted ballots cannot be changed. You will receive a receipt code to verify your ballot was counted.
+      </div>
+    </div>
+    <button class="submit-btn">Submit My Ballot</button>
+  </div>
+</div>
+
+<script>
+document.querySelectorAll('.applicant-row select').forEach(select => {
+  select.addEventListener('change', function() {
+    const row = this.closest('.applicant-row');
+    if (this.value) {
+      row.classList.add('selected');
+    } else {
+      row.classList.remove('selected');
+    }
+  });
+});
+</script>
+</body>
+</html>

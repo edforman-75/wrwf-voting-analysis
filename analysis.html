@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRWF Voting System Analysis — White Paper</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+  :root {
+    --wrwf-teal: #2a7f7f;
+    --wrwf-teal-light: #e6f3f3;
+    --wrwf-teal-dark: #1d5c5c;
+    --wrwf-gold: #c8a951;
+    --wrwf-gold-light: #f5efd8;
+    --wrwf-cream: #faf8f3;
+    --wrwf-charcoal: #2d2d2d;
+    --wrwf-warm-gray: #6b6560;
+    --wrwf-border: #d4cfc7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--wrwf-cream); color: var(--wrwf-charcoal); line-height: 1.8; }
+
+  .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+
+  .back-link { display: inline-block; color: var(--wrwf-teal); text-decoration: none; font-size: 14px; margin-bottom: 16px; }
+  .back-link:hover { text-decoration: underline; }
+
+  header { text-align: center; padding: 50px 20px 40px; border-bottom: 2px solid var(--wrwf-teal); margin-bottom: 40px; }
+  .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: var(--wrwf-teal); }
+  .logo-sub { font-size: 12px; font-weight: 500; color: var(--wrwf-warm-gray); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 600; margin-top: 24px; }
+  .page-subtitle { font-size: 15px; color: var(--wrwf-warm-gray); margin-top: 8px; }
+
+  .toc { background: white; border: 1px solid var(--wrwf-border); border-radius: 10px; padding: 24px 32px; margin-bottom: 40px; }
+  .toc h3 { font-family: 'Cormorant Garamond', serif; font-size: 18px; margin-bottom: 12px; color: var(--wrwf-teal-dark); }
+  .toc ul { list-style: none; }
+  .toc li { padding: 6px 0; border-bottom: 1px solid #eee; }
+  .toc li:last-child { border-bottom: none; }
+  .toc a { color: var(--wrwf-teal); text-decoration: none; font-size: 15px; }
+  .toc a:hover { text-decoration: underline; }
+
+  section { margin-bottom: 48px; }
+  h2 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; color: var(--wrwf-teal-dark); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--wrwf-border); }
+  h3 { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 600; color: var(--wrwf-charcoal); margin: 28px 0 14px; }
+  h4 { font-size: 16px; font-weight: 600; color: var(--wrwf-teal-dark); margin: 20px 0 10px; }
+
+  p { margin-bottom: 16px; font-size: 16px; }
+
+  .highlight-box { background: var(--wrwf-gold-light); border-left: 4px solid var(--wrwf-gold); padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+  .highlight-box p { margin-bottom: 0; }
+  .highlight-box strong { color: var(--wrwf-teal-dark); }
+
+  .problem-box { background: #fdf2f2; border-left: 4px solid #c55; padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+  .problem-box h4 { color: #8a3a3a; margin-top: 0; }
+  .problem-box p { margin-bottom: 0; color: #5a3a3a; }
+
+  .solution-box { background: #f2fdf4; border-left: 4px solid #4a8a4a; padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; }
+  .solution-box h4 { color: #3a6a3a; margin-top: 0; }
+  .solution-box p { margin-bottom: 0; color: #3a5a3a; }
+
+  ul, ol { margin: 16px 0 16px 24px; }
+  li { margin-bottom: 10px; font-size: 16px; }
+
+  .comparison-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--wrwf-border); margin: 24px 0; font-size: 14px; }
+  .comparison-table th, .comparison-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--wrwf-border); }
+  .comparison-table th { background: var(--wrwf-teal); color: white; font-weight: 600; }
+  .comparison-table tr:last-child td { border-bottom: none; }
+  .comparison-table tr:nth-child(even) { background: #faf9f7; }
+
+  .reference-card { background: white; border: 1px solid var(--wrwf-border); border-radius: 8px; padding: 20px; margin-bottom: 16px; }
+  .reference-card h4 { margin-top: 0; color: var(--wrwf-teal-dark); }
+  .reference-card .org-type { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--wrwf-warm-gray); margin-bottom: 8px; }
+  .reference-card p { font-size: 14px; margin-bottom: 8px; }
+  .reference-card .link { font-size: 13px; color: var(--wrwf-teal); }
+
+  blockquote { border-left: 3px solid var(--wrwf-teal); padding-left: 20px; margin: 24px 0; font-style: italic; color: var(--wrwf-warm-gray); }
+
+  .rec-box { background: var(--wrwf-teal-light); border: 2px solid var(--wrwf-teal); border-radius: 10px; padding: 24px 28px; margin: 30px 0; }
+  .rec-box h3 { color: var(--wrwf-teal-dark); margin-top: 0; }
+
+  footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--wrwf-border); margin-top: 40px; color: var(--wrwf-warm-gray); font-size: 13px; }
+
+  @media (max-width: 640px) {
+    .container { padding: 16px; }
+    h2 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a class='back-link' href='/'>← Back to Overview</a>
+
+  <header>
+    <div class="logo-text">Wood River Women's Foundation</div>
+    <div class="logo-sub">Ketchum, Idaho</div>
+    <div class="page-title">Rethinking Member Voting for Grant Allocation</div>
+    <div class="page-subtitle">An Analysis of Voting Approaches for Community Foundations</div>
+  </header>
+
+  <div class="toc">
+    <h3>Contents</h3>
+    <ul>
+      <li><a href="#executive-summary">Executive Summary</a></li>
+      <li><a href="#current-system">The Current System and Its Limitations</a></li>
+      <li><a href="#alternatives">Alternative Voting Approaches</a></li>
+      <li><a href="#comparison">Detailed Comparison</a></li>
+      <li><a href="#recommendation">Recommendation</a></li>
+      <li><a href="#references">Organizations & Research References</a></li>
+    </ul>
+  </div>
+
+  <section id="executive-summary">
+    <h2>Executive Summary</h2>
+    <p>The Wood River Women's Foundation uses a ranked-choice voting system where members rank their top 15 grant applicants from a pool of approximately 27 organizations. While familiar and straightforward, this approach has structural limitations that may not fully capture member preferences or ensure equitable outcomes across different grant sizes.</p>
+
+    <p>This analysis examines four voting approaches:</p>
+    <ol>
+      <li><strong>Current Ranked System</strong> — Rank 1-15 from all applicants</li>
+      <li><strong>Participatory Budgeting</strong> — Allocate 100 points across applicants</li>
+      <li><strong>Quadratic Voting</strong> — Voice credits with escalating costs for strong preferences</li>
+      <li><strong>Tiered Allocation</strong> — Rank within grant-size categories</li>
+    </ol>
+
+    <div class="highlight-box">
+      <p><strong>Key finding:</strong> Participatory budgeting offers the best balance of simplicity, expressiveness, and equal voice for WRWF's context. It makes tradeoffs visible, gives every member identical influence, and is intuitive for voters without requiring mathematical understanding.</p>
+    </div>
+  </section>
+
+  <section id="current-system">
+    <h2>The Current System and Its Limitations</h2>
+
+    <h3>How It Works</h3>
+    <p>Members receive a list of ~27 grant applicants and rank their top 15. Points are assigned inversely: 1st place = 15 points, 2nd = 14, down to 15th place = 1 point. Points are summed across all voters to produce a final ranking.</p>
+
+    <h3>Structural Problems</h3>
+
+    <div class="problem-box">
+      <h4>Problem 1: Rankings Don't Capture Intensity</h4>
+      <p>A member who feels passionately that Organization A should receive funding and is indifferent about their 2nd-15th choices has the same influence as a member who carefully deliberated all 15 rankings. The system treats a "strong first choice" identically to a "weak first choice."</p>
+    </div>
+
+    <div class="problem-box">
+      <h4>Problem 2: Large Requests Dominate</h4>
+      <p>When $25,000 requests compete directly against $5,000 requests, larger organizations with broader name recognition tend to accumulate more points. A small but impactful program serving a niche population may be crowded out not because members oppose it, but because it's competing against flagship organizations for limited ranking slots.</p>
+    </div>
+
+    <div class="problem-box">
+      <h4>Problem 3: Hidden Tradeoffs</h4>
+      <p>Ranking doesn't make resource constraints visible. A member ranking 15 organizations at $20,000 each hasn't mentally allocated $300,000 — they've just listed preferences. The actual funding tradeoffs are invisible during the voting process and only become apparent when the board makes final decisions.</p>
+    </div>
+
+    <div class="problem-box">
+      <h4>Problem 4: Strategic Voting Incentives</h4>
+      <p>Members who understand the scoring system may strategically avoid ranking strong competitors to their preferred organizations. This undermines the goal of authentic preference aggregation.</p>
+    </div>
+
+    <h3>The Equal Voice Question</h3>
+    <p>While every member gets the same 15 rankings regardless of contribution level, the system doesn't ensure equal <em>effective</em> voice. Members who vote strategically or who happen to prefer consensus favorites have more impact on outcomes than members with minority preferences.</p>
+  </section>
+
+  <section id="alternatives">
+    <h2>Alternative Voting Approaches</h2>
+
+    <h3>Participatory Budgeting (Recommended)</h3>
+    <p>Each member receives 100 points to distribute across applicants however they choose. They can give all 100 to one organization, spread them across 20, or anything in between.</p>
+
+    <div class="solution-box">
+      <h4>Key Advantages</h4>
+      <p>Tradeoffs are explicit — every point given to Organization A is a point not available for Organization B. Members experience the resource constraint directly. Intensity of preference is captured: giving 40 points to one applicant signals much stronger support than giving 5 points to eight applicants.</p>
+    </div>
+
+    <p><strong>Used by:</strong> Hundreds of cities worldwide for municipal budget allocation, including New York City, Paris, Madrid, and Porto Alegre (which pioneered the approach in 1989). The Participatory Budgeting Project has documented over 3,000 implementations.</p>
+
+    <h3>Quadratic Voting</h3>
+    <p>Members receive voice credits (e.g., 100) but the cost of expressing preference increases quadratically. One vote costs 1 credit, but 2 votes cost 4 credits total, 3 votes cost 9, and so on. This allows strong preferences while preventing any single member from dominating outcomes on multiple issues.</p>
+
+    <p><strong>Advantage:</strong> Balances intensity with breadth. A member who cares deeply about one cause can express that, but at the cost of influence elsewhere.</p>
+    <p><strong>Disadvantage:</strong> More complex to understand. The mathematical relationship isn't intuitive for all voters.</p>
+
+    <p><strong>Used by:</strong> The Colorado House of Representatives for internal priority-setting; RadicalxChange foundation advocates for its use in collective decision-making; Taiwan's government has experimented with it for policy consultations.</p>
+
+    <h3>Tiered Allocation</h3>
+    <p>Applicants are grouped by grant size (e.g., Small: $5K-$10K, Medium: $10K-$17.5K, Large: $17.5K+). Members rank their top choices within each tier separately. Funding is allocated from each pool, ensuring diversity in grant sizes.</p>
+
+    <p><strong>Advantage:</strong> Prevents large requests from crowding out small organizations. Ensures that small, focused programs compete against similar-scale requests.</p>
+    <p><strong>Disadvantage:</strong> Doesn't capture cross-tier preferences. A member can't express that they'd rather fund three small programs than one large one.</p>
+
+    <p><strong>Used by:</strong> Many community foundations and corporate giving programs use tiered approaches to ensure portfolio diversity. The Silicon Valley Community Foundation and Chicago Community Trust both employ category-based allocation.</p>
+  </section>
+
+  <section id="comparison">
+    <h2>Detailed Comparison</h2>
+
+    <table class="comparison-table">
+      <tr>
+        <th>Criterion</th>
+        <th>Current Ranked</th>
+        <th>Participatory</th>
+        <th>Quadratic</th>
+        <th>Tiered</th>
+      </tr>
+      <tr>
+        <td><strong>Simplicity for voters</strong></td>
+        <td>High</td>
+        <td>High</td>
+        <td>Medium</td>
+        <td>High</td>
+      </tr>
+      <tr>
+        <td><strong>Captures preference intensity</strong></td>
+        <td>No</td>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td>Partial</td>
+      </tr>
+      <tr>
+        <td><strong>Makes tradeoffs visible</strong></td>
+        <td>No</td>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td><strong>Protects small organizations</strong></td>
+        <td>No</td>
+        <td>Partial</td>
+        <td>Partial</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td><strong>Equal effective voice</strong></td>
+        <td>Partial</td>
+        <td>Yes</td>
+        <td>Yes</td>
+        <td>Yes</td>
+      </tr>
+      <tr>
+        <td><strong>Resistant to strategic voting</strong></td>
+        <td>Low</td>
+        <td>Medium</td>
+        <td>High</td>
+        <td>Medium</td>
+      </tr>
+      <tr>
+        <td><strong>Familiar to members</strong></td>
+        <td>Yes</td>
+        <td>Moderate</td>
+        <td>No</td>
+        <td>Moderate</td>
+      </tr>
+      <tr>
+        <td><strong>Tabulation complexity</strong></td>
+        <td>Simple</td>
+        <td>Simple</td>
+        <td>Moderate</td>
+        <td>Simple</td>
+      </tr>
+    </table>
+
+    <h3>Scenario Analysis</h3>
+
+    <h4>Scenario: Passionate Minority</h4>
+    <p>Suppose 20% of members feel strongly that a small youth program deserves funding, while 80% are mildly positive about a large food bank.</p>
+    <ul>
+      <li><strong>Ranked:</strong> Food bank likely wins (more people rank it highly)</li>
+      <li><strong>Participatory:</strong> Youth program receives concentrated points from passionate supporters; may compete effectively</li>
+      <li><strong>Quadratic:</strong> Passionate supporters can spend heavily on youth program; outcome depends on credit distribution</li>
+      <li><strong>Tiered:</strong> They don't compete directly (different tiers)</li>
+    </ul>
+
+    <h4>Scenario: Two Similar Organizations</h4>
+    <p>Two food banks with overlapping missions both apply. Members who support food security might split their support.</p>
+    <ul>
+      <li><strong>Ranked:</strong> Vote-splitting hurts both; neither may rank highly</li>
+      <li><strong>Participatory:</strong> Members can support both with partial allocations</li>
+      <li><strong>Quadratic:</strong> Same as participatory</li>
+      <li><strong>Tiered:</strong> If same tier, they compete directly within that pool</li>
+    </ul>
+  </section>
+
+  <section id="recommendation">
+    <h2>Recommendation</h2>
+
+    <div class="rec-box">
+      <h3>Participatory Budgeting with 100 Points</h3>
+      <p>For WRWF's context — 245 members, ~27 applicants, a culture of engagement and deliberation — participatory budgeting offers the best balance of:</p>
+      <ul>
+        <li><strong>Simplicity:</strong> "You have 100 points, distribute them however you want" is immediately understandable</li>
+        <li><strong>Expressiveness:</strong> Members can show how strongly they feel, not just their rank order</li>
+        <li><strong>Equal voice:</strong> Every member gets exactly 100 points regardless of contribution level</li>
+        <li><strong>Visible tradeoffs:</strong> The constraint is felt during voting, not just at the board level</li>
+        <li><strong>Engagement:</strong> The act of allocating points is more deliberative than ranking</li>
+      </ul>
+    </div>
+
+    <h3>Implementation Considerations</h3>
+    <p>The transition from ranked to participatory voting should be communicated as an enhancement, not a criticism of past practice. Key messages:</p>
+    <ul>
+      <li>This approach gives members <em>more</em> ways to express their preferences</li>
+      <li>Your voice is now reflected in degree, not just order</li>
+      <li>The tradeoffs you experience are the same ones the board faces</li>
+    </ul>
+
+    <p>A pilot year with clear feedback mechanisms would allow the foundation to assess whether participatory budgeting achieves its goals before committing permanently.</p>
+  </section>
+
+  <section id="references">
+    <h2>Organizations & Research References</h2>
+
+    <h3>Organizations Using Participatory Budgeting</h3>
+
+    <div class="reference-card">
+      <div class="org-type">Municipal Government</div>
+      <h4>New York City Civic Engagement Commission</h4>
+      <p>Largest participatory budgeting program in the US. Since 2011, NYC residents have directly allocated over $400 million to community projects through point-based voting.</p>
+      <div class="link">council.nyc.gov/pb</div>
+    </div>
+
+    <div class="reference-card">
+      <div class="org-type">Nonprofit Advocate</div>
+      <h4>The Participatory Budgeting Project</h4>
+      <p>National nonprofit that supports participatory budgeting implementation. Provides toolkits, research, and case studies from over 3,000 implementations worldwide.</p>
+      <div class="link">participatorybudgeting.org</div>
+    </div>
+
+    <div class="reference-card">
+      <div class="org-type">Community Foundation</div>
+      <h4>Boston Foundation</h4>
+      <p>Uses participatory grantmaking approaches in several giving circles, allowing donors to collectively allocate funds using point-based systems.</p>
+      <div class="link">tbf.org</div>
+    </div>
+
+    <h3>Organizations Using Quadratic Voting</h3>
+
+    <div class="reference-card">
+      <div class="org-type">Legislative Body</div>
+      <h4>Colorado House of Representatives</h4>
+      <p>Used quadratic voting in 2019 to prioritize bills for floor consideration, becoming the first US legislature to adopt the approach.</p>
+      <div class="link">Documented in "Radical Markets" by Posner & Weyl</div>
+    </div>
+
+    <div class="reference-card">
+      <div class="org-type">Research & Advocacy</div>
+      <h4>RadicalxChange Foundation</h4>
+      <p>Think tank founded by economists Glen Weyl and Eric Posner. Researches and advocates for quadratic voting, quadratic funding, and related mechanisms for collective decision-making.</p>
+      <div class="link">radicalxchange.org</div>
+    </div>
+
+    <div class="reference-card">
+      <div class="org-type">Government</div>
+      <h4>Taiwan Digital Ministry (PDIS)</h4>
+      <p>Has experimented with quadratic voting for policy consultations, including decisions about ride-sharing regulation and other contested issues.</p>
+      <div class="link">pdis.nat.gov.tw</div>
+    </div>
+
+    <h3>Research on Foundation Voting Procedures</h3>
+
+    <div class="reference-card">
+      <div class="org-type">Academic Research</div>
+      <h4>Stanford Social Innovation Review</h4>
+      <p>"Democratizing Philanthropy" (2019) examines how foundations are adopting participatory grantmaking approaches to give community members voice in funding decisions.</p>
+      <div class="link">ssir.org</div>
+    </div>
+
+    <div class="reference-card">
+      <div class="org-type">Practitioner Research</div>
+      <h4>Grantmakers for Effective Organizations (GEO)</h4>
+      <p>Publishes research on participatory grantmaking practices, including case studies of member-driven giving circles and community foundations.</p>
+      <div class="link">geofunders.org</div>
+    </div>
+
+    <div class="reference-card">
+      <div class="org-type">Community Foundation Network</div>
+      <h4>Council on Foundations</h4>
+      <p>National organization for philanthropic foundations. Publishes best practices on donor engagement, including voting mechanisms for giving circles and membership organizations.</p>
+      <div class="link">cof.org</div>
+    </div>
+
+    <div class="reference-card">
+      <div class="org-type">Academic</div>
+      <h4>Collective Decision-Making Research</h4>
+      <p>Key academic works include "Radical Markets" (Posner & Weyl, 2018) on quadratic voting, and the extensive literature on social choice theory stemming from Arrow's impossibility theorem.</p>
+    </div>
+
+    <h3>Community Foundations Using Tiered Approaches</h3>
+
+    <div class="reference-card">
+      <div class="org-type">Community Foundation</div>
+      <h4>Silicon Valley Community Foundation</h4>
+      <p>Uses category-based grantmaking with separate pools for different focus areas and grant sizes, ensuring portfolio diversity.</p>
+      <div class="link">siliconvalleycf.org</div>
+    </div>
+
+    <div class="reference-card">
+      <div class="org-type">Community Foundation</div>
+      <h4>The Chicago Community Trust</h4>
+      <p>Employs tiered approaches in some giving programs, with separate tracks for emerging organizations versus established nonprofits.</p>
+      <div class="link">cct.org</div>
+    </div>
+  </section>
+
+  <footer>
+    <p>WRWF Voting System Analysis — February 2026</p>
+    <p style="margin-top: 8px;"><a href='/' style='color: var(--wrwf-teal);'>Back to Overview</a></p>
+  </footer>
+</div>
+
+</body>
+</html>

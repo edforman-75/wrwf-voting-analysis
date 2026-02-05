@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRWF Voting System — Analysis & Prototypes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+  :root {
+    --wrwf-teal: #2a7f7f;
+    --wrwf-teal-light: #e6f3f3;
+    --wrwf-teal-dark: #1d5c5c;
+    --wrwf-gold: #c8a951;
+    --wrwf-gold-light: #f5efd8;
+    --wrwf-cream: #faf8f3;
+    --wrwf-charcoal: #2d2d2d;
+    --wrwf-warm-gray: #6b6560;
+    --wrwf-border: #d4cfc7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--wrwf-cream); color: var(--wrwf-charcoal); line-height: 1.7; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+  header { text-align: center; padding: 50px 20px 40px; border-bottom: 2px solid var(--wrwf-teal); margin-bottom: 40px; }
+  .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 32px; font-weight: 700; color: var(--wrwf-teal); }
+  .logo-sub { font-size: 13px; font-weight: 500; color: var(--wrwf-warm-gray); letter-spacing: 3px; text-transform: uppercase; margin-top: 6px; }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-size: 26px; font-weight: 600; margin-top: 24px; color: var(--wrwf-charcoal); }
+
+  .intro-section { background: white; border: 1px solid var(--wrwf-border); border-radius: 10px; padding: 32px 36px; margin-bottom: 36px; }
+  .intro-section h2 { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 700; color: var(--wrwf-teal-dark); margin-bottom: 16px; }
+  .intro-section p { margin-bottom: 14px; font-size: 15px; }
+  .intro-section ul { margin: 16px 0 16px 20px; }
+  .intro-section li { margin-bottom: 8px; font-size: 15px; }
+
+  .status-box { background: var(--wrwf-teal-light); border: 2px solid var(--wrwf-teal); border-radius: 8px; padding: 20px 24px; margin-top: 20px; }
+  .status-box h4 { color: var(--wrwf-teal-dark); font-size: 16px; margin-bottom: 10px; }
+  .status-box p { font-size: 14px; color: var(--wrwf-teal-dark); margin-bottom: 0; }
+
+  .nav-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 36px 0; }
+  .nav-card { background: white; border: 1px solid var(--wrwf-border); border-radius: 10px; padding: 24px; transition: all 0.2s; text-decoration: none; color: inherit; display: block; }
+  .nav-card:hover { box-shadow: 0 4px 20px rgba(42,127,127,0.15); border-color: var(--wrwf-teal); transform: translateY(-2px); }
+  .nav-card h3 { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: var(--wrwf-teal-dark); margin-bottom: 8px; }
+  .nav-card p { font-size: 14px; color: var(--wrwf-warm-gray); }
+  .nav-card .badge { display: inline-block; background: var(--wrwf-teal-light); color: var(--wrwf-teal-dark); font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 12px; margin-top: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .nav-card .badge.recommended { background: var(--wrwf-gold-light); color: #8a6d20; }
+
+  section { margin-bottom: 48px; }
+  section h2 { font-family: 'Cormorant Garamond', serif; font-size: 24px; font-weight: 700; color: var(--wrwf-teal-dark); margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--wrwf-border); }
+
+  .comparison-table { width: 100%; border-collapse: collapse; background: white; border-radius: 10px; overflow: hidden; border: 1px solid var(--wrwf-border); margin: 20px 0; }
+  .comparison-table th, .comparison-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--wrwf-border); font-size: 14px; }
+  .comparison-table th { background: var(--wrwf-teal); color: white; font-weight: 600; }
+  .comparison-table tr:last-child td { border-bottom: none; }
+  .comparison-table tr:nth-child(even) { background: #faf9f7; }
+  .comparison-table .check { color: var(--wrwf-teal); font-weight: bold; }
+  .comparison-table .cross { color: #999; }
+
+  .process-link { display: block; background: linear-gradient(135deg, var(--wrwf-teal) 0%, var(--wrwf-teal-dark) 100%); color: white; text-align: center; padding: 28px; border-radius: 10px; text-decoration: none; margin: 30px 0; transition: transform 0.2s; }
+  .process-link:hover { transform: scale(1.02); }
+  .process-link h3 { font-family: 'Cormorant Garamond', serif; font-size: 22px; margin-bottom: 8px; }
+  .process-link p { font-size: 14px; opacity: 0.9; }
+
+  .studio360-box { background: linear-gradient(135deg, #f8f6f2 0%, #f0ede6 100%); border: 2px solid var(--wrwf-gold); border-radius: 10px; padding: 28px 32px; margin: 40px 0; }
+  .studio360-box h3 { font-family: 'Cormorant Garamond', serif; font-size: 20px; font-weight: 700; color: #8a6d20; margin-bottom: 14px; }
+  .studio360-box p { font-size: 15px; color: var(--wrwf-charcoal); margin-bottom: 12px; }
+  .studio360-box ul { margin: 16px 0 0 20px; }
+  .studio360-box li { margin-bottom: 8px; font-size: 14px; color: var(--wrwf-warm-gray); }
+
+  footer { text-align: center; padding: 40px 20px; border-top: 1px solid var(--wrwf-border); margin-top: 40px; color: var(--wrwf-warm-gray); font-size: 13px; }
+
+  @media (max-width: 640px) {
+    .container { padding: 16px; }
+    .intro-section { padding: 20px 24px; }
+    header { padding: 30px 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <div class="logo-text">Wood River Women's Foundation</div>
+    <div class="logo-sub">Ketchum, Idaho</div>
+    <div class="page-title">Pooled Fund Grants Voting System</div>
+  </header>
+
+  <div class="intro-section">
+    <h2>Overview</h2>
+    <p>This project examined how WRWF members vote to allocate pooled fund grants, with the goal of making the process more expressive and meaningful while remaining simple for 245+ members to complete.</p>
+
+    <p><strong>The research explored:</strong></p>
+    <ul>
+      <li>Limitations of the current ranked-choice voting system (rank 1-15)</li>
+      <li>Alternative approaches used by community foundations, municipalities, and member organizations</li>
+      <li>How to ensure equal voice regardless of contribution level</li>
+      <li>Ballot secrecy and voter authentication</li>
+    </ul>
+
+    <p><strong>What's available here:</strong></p>
+    <ul>
+      <li>A white paper analyzing voting approaches with references to organizations using each method</li>
+      <li>Interactive prototype ballots for four different voting systems</li>
+      <li>A process flow chart showing the complete voting workflow</li>
+    </ul>
+
+    <div class="status-box">
+      <h4>The System is Built</h4>
+      <p>A complete, working voting application has been developed — Flask/Python with SQLite, supporting all four voting approaches. It includes personal voting links, auto-save drafts, ballot secrecy, an admin dashboard, and CSV export. The source code is in a GitHub repository, ready for deployment. To use it for actual WRWF voting would require integration with the member email list and hosting on a WRWF domain.</p>
+    </div>
+  </div>
+
+  <a class='process-link' href='/analysis' style='background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%); margin-bottom: 30px;'>
+    <h3>Read the Full Analysis</h3>
+    <p>White paper examining the current voting system's limitations, alternative approaches, and references to organizations using each method.</p>
+  </a>
+
+  <section>
+    <h2>Prototype Ballots</h2>
+    <p style="margin-bottom: 20px; color: var(--wrwf-warm-gray);">Click any card to see a working prototype of that voting approach. Each shows sample applicants and the actual interface voters would use.</p>
+
+    <div class="nav-cards">
+      <a class='nav-card' href='/ballot-participatory'>
+        <h3>Participatory Budgeting</h3>
+        <p>Each member gets 100 points to distribute across applicants however they choose. Tradeoffs are explicit and visible.</p>
+        <span class="badge recommended">Recommended</span>
+      </a>
+
+      <a class='nav-card' href='/ballot-quadratic'>
+        <h3>Quadratic Voting</h3>
+        <p>100 voice credits, but expressing stronger preferences costs more. Prevents single-issue dominance while allowing intensity.</p>
+        <span class="badge">Advanced</span>
+      </a>
+
+      <a class='nav-card' href='/ballot-tiered'>
+        <h3>Tiered Allocation</h3>
+        <p>Rank your top 5 in each grant size tier. Ensures small organizations compete with similar-sized requests.</p>
+        <span class="badge">Structured</span>
+      </a>
+
+      <a class='nav-card' href='/ballot-ranked'>
+        <h3>Current Ranked System</h3>
+        <p>Rank 1-15 from the full applicant list. Rank #1 = 15 points, #15 = 1 point. Included for comparison.</p>
+        <span class="badge">Current</span>
+      </a>
+    </div>
+  </section>
+
+  <a class='process-link' href='/process'>
+    <h3>View the Process Flow Chart</h3>
+    <p>See how members, leadership, and staff interact with the voting system — from ballot distribution through final results.</p>
+  </a>
+
+  <section>
+    <h2>Comparison at a Glance</h2>
+    <table class="comparison-table">
+      <tr>
+        <th>Feature</th>
+        <th>Participatory</th>
+        <th>Quadratic</th>
+        <th>Tiered</th>
+        <th>Current</th>
+      </tr>
+      <tr>
+        <td>Equal voice for all members</td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+      </tr>
+      <tr>
+        <td>Visible tradeoffs</td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+      </tr>
+      <tr>
+        <td>Protects small orgs from large-request dominance</td>
+        <td class="cross">—</td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+        <td class="cross">—</td>
+      </tr>
+      <tr>
+        <td>Simplicity for voters</td>
+        <td class="check">✓✓</td>
+        <td class="cross">—</td>
+        <td class="check">✓</td>
+        <td class="check">✓✓</td>
+      </tr>
+      <tr>
+        <td>Expresses preference intensity</td>
+        <td class="check">✓</td>
+        <td class="check">✓✓</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+      </tr>
+      <tr>
+        <td>Familiar to members</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="cross">—</td>
+        <td class="check">✓✓</td>
+      </tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Key Features of the System</h2>
+    <div class="nav-cards">
+      <div class="nav-card" style="cursor: default;">
+        <h3>Auto-Save Drafts</h3>
+        <p>Voters can start their ballot, close their browser, return days later from a different device, and pick up exactly where they left off. No lost work.</p>
+      </div>
+
+      <div class="nav-card" style="cursor: default;">
+        <h3>Ballot Secrecy</h3>
+        <p>At submission, the voter's identity is permanently severed from their ballot. Even admins cannot see how any individual voted.</p>
+      </div>
+
+      <div class="nav-card" style="cursor: default;">
+        <h3>Personal Voting Links</h3>
+        <p>Each member receives a unique link by email. No passwords to remember — clicking the link logs them in automatically.</p>
+      </div>
+
+      <div class="nav-card" style="cursor: default;">
+        <h3>Real-Time Admin Dashboard</h3>
+        <p>See participation stats, send reminders to non-voters, export results — all from a simple web interface.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="studio360-box">
+    <h3>Integration with WRWF Infrastructure</h3>
+    <p>The voting system is a standalone Flask/Python application that can be hosted anywhere. <strong>Studio360</strong>, the local firm that built the WRWF website, could handle the technical integration:</p>
+    <ul>
+      <li>Host on a WRWF subdomain (e.g., <strong>vote.woodriverwomensfoundation.org</strong>)</li>
+      <li>Connect to existing member email lists for ballot distribution</li>
+      <li>Style to match the main WRWF website branding</li>
+      <li>Set up SSL certificate for secure voting</li>
+    </ul>
+    <p>The technical handoff is straightforward — all code is in a single GitHub repository with documentation. Alternatively, the system can be hosted on a simple cloud service (PythonAnywhere, Render, etc.) without Studio360 involvement.</p>
+  </div>
+
+  <footer>
+    <p>WRWF Voting System — February 2026</p>
+    <p style="margin-top: 8px;">Built with Flask/Python · Source code available on GitHub</p>
+  </footer>
+</div>
+
+</body>
+</html>

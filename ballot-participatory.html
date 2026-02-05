@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WRWF Grants Ballot — Approach B: Participatory Budgeting</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap');
+
+  :root {
+    --wrwf-teal: #2a7f7f;
+    --wrwf-teal-light: #e6f3f3;
+    --wrwf-teal-dark: #1d5c5c;
+    --wrwf-gold: #c8a951;
+    --wrwf-gold-light: #f5efd8;
+    --wrwf-cream: #faf8f3;
+    --wrwf-charcoal: #2d2d2d;
+    --wrwf-warm-gray: #6b6560;
+    --wrwf-border: #d4cfc7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Source Sans 3', sans-serif; background: var(--wrwf-cream); color: var(--wrwf-charcoal); line-height: 1.6; }
+  .ballot-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+
+  .back-link { display: inline-block; color: var(--wrwf-teal); text-decoration: none; font-size: 14px; margin-bottom: 16px; }
+  .back-link:hover { text-decoration: underline; }
+
+  .ballot-header { text-align: center; padding: 40px 20px 30px; border-bottom: 2px solid var(--wrwf-teal); margin-bottom: 30px; }
+  .logo-text { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; color: var(--wrwf-teal); }
+  .logo-sub { font-size: 12px; font-weight: 500; color: var(--wrwf-warm-gray); letter-spacing: 3px; text-transform: uppercase; margin-top: 4px; }
+  .ballot-title { font-family: 'Cormorant Garamond', serif; font-size: 22px; font-weight: 600; margin-top: 20px; }
+  .ballot-year { font-size: 14px; color: var(--wrwf-warm-gray); margin-top: 4px; }
+  .badge { display: inline-block; background: var(--wrwf-teal-light); color: var(--wrwf-teal-dark); font-size: 12px; font-weight: 600; padding: 4px 14px; border-radius: 20px; margin-top: 12px; }
+
+  .instructions { background: white; border: 1px solid var(--wrwf-border); border-radius: 8px; padding: 24px; margin-bottom: 24px; }
+  .instructions h2 { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; color: var(--wrwf-teal-dark); margin-bottom: 12px; }
+  .instructions p { font-size: 15px; color: var(--wrwf-warm-gray); margin-bottom: 8px; }
+  .instructions .highlight { background: var(--wrwf-gold-light); border-left: 3px solid var(--wrwf-gold); padding: 12px 16px; margin-top: 12px; font-size: 14px; color: var(--wrwf-charcoal); }
+
+  /* STICKY BUDGET TRACKER */
+  .budget-tracker {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: white;
+    border: 2px solid var(--wrwf-teal);
+    border-radius: 10px;
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+  }
+
+  .budget-tracker-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .budget-label {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--wrwf-warm-gray);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .budget-amounts {
+    display: flex;
+    gap: 24px;
+    align-items: baseline;
+  }
+
+  .budget-figure {
+    text-align: center;
+  }
+
+  .budget-figure .amount {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 32px;
+    font-weight: 700;
+  }
+
+  .budget-figure .amount.remaining { color: var(--wrwf-teal); }
+  .budget-figure .amount.spent { color: var(--wrwf-gold); }
+  .budget-figure .amount.over { color: #c55; }
+
+  .budget-figure .sublabel {
+    font-size: 11px;
+    color: var(--wrwf-warm-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .budget-bar-wrapper {
+    flex: 1;
+    min-width: 200px;
+  }
+
+  .budget-bar {
+    height: 12px;
+    background: #eee;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .budget-bar-fill {
+    height: 100%;
+    border-radius: 6px;
+    transition: width 0.3s ease, background 0.3s ease;
+    background: var(--wrwf-teal);
+  }
+
+  .budget-bar-fill.warning { background: var(--wrwf-gold); }
+  .budget-bar-fill.over { background: #c55; }
+
+  /* Applicant cards */
+  .applicant-card {
+    background: white;
+    border: 1px solid var(--wrwf-border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    transition: box-shadow 0.2s;
+  }
+
+  .applicant-card:hover { box-shadow: 0 2px 12px rgba(42,127,127,0.1); }
+
+  .card-top { display: flex; align-items: flex-start; padding: 16px 24px 0; gap: 16px; }
+
+  .allocation-input {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .allocation-input label {
+    font-size: 11px;
+    color: var(--wrwf-warm-gray);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .point-input-wrap {
+    display: flex;
+    align-items: center;
+    border: 2px solid var(--wrwf-border);
+    border-radius: 6px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .point-input-wrap:focus-within { border-color: var(--wrwf-teal); }
+
+  .point-label {
+    padding: 0 8px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--wrwf-warm-gray);
+    background: #f8f6f2;
+  }
+
+  .point-input {
+    width: 70px;
+    height: 40px;
+    border: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--wrwf-teal-dark);
+    text-align: right;
+    padding-right: 8px;
+    outline: none;
+  }
+
+  .quick-amounts {
+    display: flex;
+    gap: 4px;
+    margin-top: 4px;
+  }
+
+  .quick-btn {
+    font-size: 10px;
+    padding: 2px 6px;
+    border: 1px solid var(--wrwf-border);
+    border-radius: 4px;
+    background: white;
+    color: var(--wrwf-warm-gray);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .quick-btn:hover { background: var(--wrwf-teal-light); color: var(--wrwf-teal-dark); border-color: var(--wrwf-teal); }
+
+  .card-info { flex: 1; }
+  .org-name { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; }
+  .grant-amount { display: inline-block; font-size: 14px; font-weight: 600; color: var(--wrwf-teal); margin-top: 2px; }
+  .project-title { font-size: 13px; font-weight: 500; color: var(--wrwf-warm-gray); font-style: italic; }
+
+  .card-description { padding: 10px 24px 12px; font-size: 14px; color: #555; line-height: 1.6; }
+  .card-links { display: flex; gap: 16px; padding: 0 24px 14px; }
+  .card-links a { font-size: 13px; color: var(--wrwf-teal); text-decoration: none; font-weight: 500; }
+  .card-links a:hover { text-decoration: underline; }
+  .card-links a.video::before { content: '▶ '; }
+  .card-links a.transcript::before { content: '📄 '; }
+
+  .alloc-feedback {
+    padding: 0 24px 12px;
+    font-size: 12px;
+    color: var(--wrwf-warm-gray);
+    font-style: italic;
+  }
+
+  .submit-area { text-align: center; padding: 30px; margin-top: 20px; border-top: 2px solid var(--wrwf-teal); }
+  .submit-btn { background: var(--wrwf-teal); color: white; font-size: 16px; font-weight: 600; padding: 14px 48px; border: none; border-radius: 6px; cursor: pointer; }
+  .submit-btn:hover { background: var(--wrwf-teal-dark); }
+  .submit-note { font-size: 13px; color: var(--wrwf-warm-gray); margin-top: 10px; }
+
+  .sample-banner { background: #c55; color: white; text-align: center; padding: 8px; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+
+  .improvement-note { background: #eef5ee; border: 1px solid #c2dbc2; border-radius: 6px; padding: 16px 20px; margin: 0 0 24px; font-size: 14px; color: #3a5d3a; }
+  .improvement-note strong { color: #2a6d2a; }
+
+  @media (max-width: 640px) {
+    .budget-amounts { gap: 12px; }
+    .budget-figure .amount { font-size: 24px; }
+    .card-top { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sample-banner">⬥ SAMPLE BALLOT — APPROACH B: PARTICIPATORY BUDGETING ⬥</div>
+
+<div class="ballot-container">
+
+  <a class='back-link' href='/'>← Back to Overview</a>
+
+  <div class="ballot-header">
+    <div class="logo-text">Wood River Women's Foundation</div>
+    <div class="logo-sub">Ketchum, Idaho &nbsp;·&nbsp; Est. 2005</div>
+    <div class="ballot-title">2026 Pooled Fund Grants Ballot</div>
+    <div class="ballot-year">Approach B — Participatory Budgeting</div>
+    <div class="badge">You have 100 points to allocate</div>
+  </div>
+
+  <div class="instructions">
+    <h2>Voting Instructions</h2>
+    <p>You have <strong>100 points</strong> to distribute across the 27 applicants below. Every member receives the same 100 points regardless of contribution level.</p>
+    <p>Allocate any number of points to any applicant. You may give all 100 to one organization, spread them across many, or anything in between.</p>
+    <p>Each applicant's requested grant amount is shown. The tracker at the top shows how many points you've used and how many remain.</p>
+    <div class="highlight">
+      <strong>What's different:</strong> Instead of abstract rankings, you're making concrete allocation decisions. Giving 20 points to a $5,000 request is the same commitment as giving 20 points to a $25,000 request — but the smaller organization needs fewer total points across all voters to be fully funded. The tradeoffs are explicit: every point you give one applicant is a point you can't give another.
+    </div>
+  </div>
+
+  <div class="improvement-note">
+    <strong>✦ Key improvement:</strong> Tradeoffs are now visible and concrete. Every member gets equal voice through identical point budgets, and you can see exactly how your choices consume your allocation.
+  </div>
+
+  <!-- STICKY BUDGET TRACKER -->
+  <div class="budget-tracker" id="budgetTracker">
+    <div class="budget-label">Your Point Allocation</div>
+    <div class="budget-tracker-inner">
+      <div class="budget-amounts">
+        <div class="budget-figure">
+          <div class="amount remaining" id="remainingAmount">100</div>
+          <div class="sublabel">Points Remaining</div>
+        </div>
+        <div class="budget-figure">
+          <div class="amount spent" id="spentAmount">0</div>
+          <div class="sublabel">Points Allocated</div>
+        </div>
+      </div>
+      <div class="budget-bar-wrapper">
+        <div class="budget-bar">
+          <div class="budget-bar-fill" id="budgetBarFill" style="width: 0%"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Applicant cards -->
+  <div class="applicant-card">
+    <div class="card-top">
+      <div class="allocation-input">
+        <label>Allocate</label>
+        <div class="point-input-wrap">
+          
+          <input type="number" class="point-input alloc-input" min="0" max="100" step="5" value="0" data-request="25000" placeholder="0">
+        </div>
+        <div class="quick-amounts">
+          <button class="quick-btn" onclick="setAmount(this, 10)">10 pts</button>
+          <button class="quick-btn" onclick="setAmount(this, 25)">25 pts</button>
+          <button class="quick-btn" onclick="setAmount(this, 50)">50 pts</button>
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">The Hunger Coalition</div>
+        <div class="grant-amount">Requesting: $25,000</div>
+        <div class="project-title">Expanding Emergency Food Distribution in South County</div>
+      </div>
+    </div>
+    <div class="card-description">Provides food assistance to 3,000+ families annually. This grant funds a new refrigerated distribution hub in Bellevue for south-county families who currently travel 30+ miles.</div>
+    <div class="alloc-feedback" id="feedback0">0 points allocated.</div>
+    <div class="card-links">
+      <a href="#" class="video">Watch 5-Min Presentation</a>
+      <a href="#" class="transcript">Read Transcript</a>
+    </div>
+  </div>
+
+  <div class="applicant-card">
+    <div class="card-top">
+      <div class="allocation-input">
+        <label>Allocate</label>
+        <div class="point-input-wrap">
+          
+          <input type="number" class="point-input alloc-input" min="0" max="100" step="5" value="0" data-request="8400" placeholder="0">
+        </div>
+        <div class="quick-amounts">
+          <button class="quick-btn" onclick="setAmount(this, 10)">10 pts</button>
+          <button class="quick-btn" onclick="setAmount(this, 25)">25 pts</button>
+          <button class="quick-btn" onclick="setAmount(this, 50)">50 pts</button>
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">Smiley Creek Fire Protection District</div>
+        <div class="grant-amount">Requesting: $8,400</div>
+        <div class="project-title">AED Equipment for Remote North Valley</div>
+      </div>
+    </div>
+    <div class="card-description">Serves a remote area with 45-minute emergency response times. This grant places four AEDs in community locations and trains 60 volunteers.</div>
+    <div class="alloc-feedback" id="feedback1">0 points allocated.</div>
+    <div class="card-links">
+      <a href="#" class="video">Watch 5-Min Presentation</a>
+      <a href="#" class="transcript">Read Transcript</a>
+    </div>
+  </div>
+
+  <div class="applicant-card">
+    <div class="card-top">
+      <div class="allocation-input">
+        <label>Allocate</label>
+        <div class="point-input-wrap">
+          
+          <input type="number" class="point-input alloc-input" min="0" max="100" step="5" value="0" data-request="5000" placeholder="0">
+        </div>
+        <div class="quick-amounts">
+          <button class="quick-btn" onclick="setAmount(this, 10)">10 pts</button>
+          <button class="quick-btn" onclick="setAmount(this, 25)">25 pts</button>
+          <button class="quick-btn" onclick="setAmount(this, 50)">50 pts</button>
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">Project 208 FC</div>
+        <div class="grant-amount">Requesting: $5,000</div>
+        <div class="project-title">Youth Mentorship Through Soccer</div>
+      </div>
+    </div>
+    <div class="card-description">Uses soccer for mentorship among underserved youth. Funds scholarships for 40 children, coaching stipends, equipment, and transportation. Primarily serves Spanish-speaking families.</div>
+    <div class="alloc-feedback" id="feedback2">0 points allocated.</div>
+    <div class="card-links">
+      <a href="#" class="video">Watch 5-Min Presentation</a>
+      <a href="#" class="transcript">Read Transcript</a>
+    </div>
+  </div>
+
+  <div class="applicant-card">
+    <div class="card-top">
+      <div class="allocation-input">
+        <label>Allocate</label>
+        <div class="point-input-wrap">
+          
+          <input type="number" class="point-input alloc-input" min="0" max="100" step="5" value="0" data-request="25000" placeholder="0">
+        </div>
+        <div class="quick-amounts">
+          <button class="quick-btn" onclick="setAmount(this, 10)">10 pts</button>
+          <button class="quick-btn" onclick="setAmount(this, 25)">25 pts</button>
+          <button class="quick-btn" onclick="setAmount(this, 50)">50 pts</button>
+        </div>
+      </div>
+      <div class="card-info">
+        <div class="org-name">NAMI Wood River Valley</div>
+        <div class="grant-amount">Requesting: $25,000</div>
+        <div class="project-title">Preventative Mental Health & Support Groups</div>
+      </div>
+    </div>
+    <div class="card-description">Provides free mental health education and support groups. This grant expands youth programming to all three valley middle schools and launches a bilingual family support program.</div>
+    <div class="alloc-feedback" id="feedback3">0 points allocated.</div>
+    <div class="card-links">
+      <a href="#" class="video">Watch 5-Min Presentation</a>
+      <a href="#" class="transcript">Read Transcript</a>
+    </div>
+  </div>
+
+  <div style="text-align:center; padding: 24px; color: var(--wrwf-warm-gray); font-style: italic; font-size: 14px;">
+    — 23 additional applicants would appear here —
+  </div>
+
+  <div class="submit-area">
+    <div style="background: #fff8f0; border: 1px solid #e8d4b8; border-left: 4px solid #c8890a; border-radius: 6px; padding: 16px 20px; margin-bottom: 20px; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+      <div style="font-weight: 600; color: #8a5d00; margin-bottom: 6px;">⚠ Your ballot is final once submitted</div>
+      <div style="font-size: 14px; color: #6b5a3e; line-height: 1.5;">
+        To protect the secrecy of your vote, <strong>submitted ballots cannot be changed, retrieved, or resubmitted.</strong> Your ballot will be permanently separated from your identity at the moment of submission. Please review your allocations carefully before submitting. You will receive a unique receipt code to verify your ballot was counted.
+      </div>
+    </div>
+    <div style="font-size: 13px; color: var(--wrwf-warm-gray); margin-bottom: 14px;">You may save your work and return as many times as you like before submitting. The ballot closes on March 26, 2026.</div>
+    <button class="submit-btn" id="submitBtn">Submit My Ballot</button>
+  </div>
+</div>
+
+<script>
+const BUDGET = 100;
+const inputs = document.querySelectorAll('.alloc-input');
+
+function setAmount(btn, amount) {
+  const input = btn.closest('.allocation-input').querySelector('.alloc-input');
+  input.value = amount;
+  updateBudget();
+}
+
+function updateBudget() {
+  let spent = 0;
+  inputs.forEach((input, i) => {
+    const val = parseInt(input.value) || 0;
+    spent += val;
+    const request = parseInt(input.dataset.request);
+    const fb = document.getElementById('feedback' + i);
+    if (fb) fb.textContent = `You allocated ${val} points to this applicant (requesting $${request.toLocaleString()}).`;
+  });
+
+  const remaining = BUDGET - spent;
+  document.getElementById('remainingAmount').textContent = remaining.toLocaleString();
+  document.getElementById('spentAmount').textContent = spent.toLocaleString();
+
+  const pct = Math.min((spent / BUDGET) * 100, 100);
+  const bar = document.getElementById('budgetBarFill');
+  bar.style.width = pct + '%';
+
+  const remEl = document.getElementById('remainingAmount');
+  bar.className = 'budget-bar-fill';
+  remEl.className = 'amount remaining';
+
+  if (remaining < 0) {
+    bar.classList.add('over');
+    remEl.classList.remove('remaining');
+    remEl.classList.add('over');
+  } else if (remaining < 20) {
+    bar.classList.add('warning');
+  }
+}
+
+inputs.forEach(input => {
+  input.addEventListener('input', updateBudget);
+  input.addEventListener('change', updateBudget);
+});
+</script>
+</body>
+</html>
